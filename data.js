@@ -13,9 +13,9 @@ window.PROJECTS = [
       ["training", "PyTorch / Python"],
       ["export", "weights → flat binary blob"],
       ["inference", "C — forward pass written by hand"],
-      ["interface", "Python GUI"],
+      ["interface", "C UI"],
       ["verification", "PyTorch ↔ C output parity"],
-      ["source", "github.com/you/number-guesser"]
+      ["source", "github.com/sahandkhodayi/Number-Guesser"]
     ],
     pipeline: [
       ["draw", "28×28 canvas, normalized"],
@@ -32,6 +32,106 @@ window.PROJECTS = [
       "What does the convolution actually cost in memory bandwidth, not FLOPs?"
     ],
     related: ["001", "002", "006"]
+  },
+  {
+    id: "002",
+    slug: "nn-from-scratch",
+    title: "NN from Scratch with Visuals",
+    blurb:
+      "A neural network framework built from scratch with forward propagation, backpropagation, gradient descent, and real-time visualization of neurons, weights, and training. No autograd, no PyTorch — just NumPy and the chain rule.",
+    tags: ["python", "numpy", "backprop", "visualization", "from-scratch"],
+    status: "built",
+    spec: [
+      ["language", "Python + NumPy"],
+      ["custom components", "neurons · layers · weights · biases"],
+      ["forward pass", "implemented manually"],
+      ["backward pass", "chain rule, gradient calculation"],
+      ["optimizer", "gradient descent"],
+      ["interface", "interactive GUI playground"],
+      ["visualization", "network structure · live neuron outputs · decision boundaries · loss curve"],
+      ["source", "github.com/sahandkhodayi/NN-s-from-scratch-with-viuals"]
+    ],
+    pipeline: [
+      ["build", "define network topology in GUI"],
+      ["forward", "manual matrix ops through layers"],
+      ["loss", "compare prediction to target"],
+      ["backward", "apply chain rule layer by layer"],
+      ["update", "gradient descent on weights/biases"],
+      ["visualize", "live weights, neurons, decision boundary"]
+    ],
+    questions: [
+      "What does backpropagation actually look like when you implement every derivative by hand?",
+      "How does the decision boundary evolve during training, frame by frame?",
+      "At what point does adding more layers stop helping on simple datasets?",
+      "What breaks first when you increase learning rate — convergence or stability?"
+    ],
+    related: ["003", "004"]
+  },
+  {
+    id: "003",
+    slug: "ml-models-from-scratch",
+    title: "Machine Learning Models",
+    blurb:
+      "Linear and logistic regression built from first principles using only NumPy. The focus is understanding the mathematics behind machine learning by implementing the algorithms from scratch rather than relying on high-level libraries.",
+    tags: ["python", "numpy", "linear-regression", "logistic-regression", "from-scratch"],
+    status: "built",
+    spec: [
+      ["language", "Python + NumPy"],
+      ["linear regression", "multiple features · feature normalization · MSE · R²"],
+      ["logistic regression", "binary classification · sigmoid · cross-entropy"],
+      ["optimization", "gradient descent (implemented manually)"],
+      ["evaluation", "training visualization · R² · accuracy"],
+      ["source", "github.com/sahandkhodayi/Machine-learning-Models"]
+    ],
+    pipeline: [
+      ["data", "load and normalize features"],
+      ["hypothesis", "weighted sum of inputs"],
+      ["cost", "MSE (linear) / cross-entropy (logistic)"],
+      ["gradient", "compute partial derivatives"],
+      ["update", "gradient descent step"],
+      ["evaluate", "R² / accuracy + convergence graph"]
+    ],
+    questions: [
+      "How does feature normalization change the convergence path of gradient descent?",
+      "What is the mathematical reason sigmoid introduces non-linearity?",
+      "How does the choice of learning rate affect the cost surface traversal?",
+      "When does logistic regression fail where a non-linear model would succeed?"
+    ],
+    related: ["004", "006"]
+  },
+  {
+    id: "004",
+    slug: "math-network",
+    title: "Math Network",
+    blurb:
+      "A PyTorch neural network for approximating mathematical functions. It takes a function, generates training data from it, and trains an MLP to learn the relationship between x and f(x) — with Fourier-feature input encoding for high-frequency functions.",
+    tags: ["pytorch", "mlp", "fourier-features", "function-approximation", "mathematics"],
+    status: "built",
+    spec: [
+      ["framework", "PyTorch"],
+      ["model", "Multi-Layer Perceptron (MLP)"],
+      ["input encoding", "Fourier features (sin/cos of kπx)"],
+      ["hidden activation", "Tanh"],
+      ["loss", "MSE / L1"],
+      ["optimizer", "SGD (configurable)"],
+      ["evaluation", "R² score · loss tracking · true vs predicted graph"],
+      ["source", "github.com/sahandkhodayi/Math-function-approximation-with-NN"]
+    ],
+    pipeline: [
+      ["function", "define f(x)"],
+      ["generate", "sample (x, f(x)) pairs"],
+      ["split", "train / test"],
+      ["encode", "Fourier feature mapping"],
+      ["train", "MLP with Tanh hidden layers"],
+      ["evaluate", "MSE / R² + visual comparison"]
+    ],
+    questions: [
+      "Why can a standard MLP struggle with rapidly oscillating functions?",
+      "How much does Fourier feature encoding improve approximation of sin(kx) vs a plain input?",
+      "How does the number of hidden layers affect the smoothness of the learned function?",
+      "What is the trade-off between fitting the function exactly and generalizing between sample points?"
+    ],
+    related: ["002", "005"]
   }
 ];
 
@@ -52,27 +152,30 @@ window.EXPERIMENTS = [
   },
   {
     id: "002",
-    title: "convolution from scratch",
-    status: "ongoing",
-    tag: "q",
+    title: "backpropagation from scratch",
+    status: "built",
+    tag: "ok",
     body:
-      "Implement 2D convolution with no library calls — direct nested loops first, then im2col, then compare. The goal is to feel where the time actually goes before reaching for an optimized kernel.",
+      "Implement the chain rule manually for every layer in the NN from Scratch framework. No autograd — just derivative calculations and weight updates. Visualized live to see the effect of each update.",
     spec: [
-      ["variants", "direct · im2col · strided"],
-      ["measure", "wall time, cache behaviour"],
-      ["state", "in progress"]
+      ["component", "NN-s-from-scratch-with-viuals"],
+      ["method", "manual derivative per layer"],
+      ["visualization", "live weights and neuron outputs"],
+      ["state", "reproducible"]
     ]
   },
   {
     id: "003",
-    title: "gradient descent experiments",
-    status: "ongoing",
-    tag: "q",
+    title: "gradient descent convergence study",
+    status: "built",
+    tag: "ok",
     body:
-      "Learning-rate sweeps, momentum, and convergence behaviour on small problems where every step can be plotted and understood by hand.",
+      "Compare learning rates, momentum, and convergence behaviour on linear and logistic regression problems implemented from scratch. Plot the cost surface and every step taken toward the minimum.",
     spec: [
-      ["variants", "SGD · momentum · Adam"],
-      ["state", "in progress"]
+      ["component", "Machine-learning-Models"],
+      ["variants", "SGD · momentum"],
+      ["metric", "cost vs iteration, final R²"],
+      ["state", "reproducible"]
     ]
   },
   {
@@ -86,12 +189,17 @@ window.EXPERIMENTS = [
   },
   {
     id: "005",
-    title: "CNN architecture experiments",
-    status: "planned",
-    tag: "p",
+    title: "Fourier feature encoding for function approximation",
+    status: "built",
+    tag: "ok",
     body:
-      "Depth, kernel size, and channel width as independent variables. How much of the accuracy comes from the architecture versus the training regime?",
-    spec: [["state", "not started"]]
+      "Compare a plain MLP receiving only x against an MLP with Fourier features (sin/cos of kπx) when approximating high-frequency functions. The Fourier version learns oscillation patterns that the plain version cannot.",
+    spec: [
+      ["component", "Math-Network"],
+      ["metric", "MSE, R²"],
+      ["finding", "Fourier features dramatically improve high-frequency fit"],
+      ["state", "reproducible"]
+    ]
   },
   {
     id: "006",
@@ -119,12 +227,14 @@ window.EXPERIMENTS = [
 window.KNOWLEDGE = [
   {
     branch: "AI",
-    count: 9,
+    count: 12,
     leaves: [
-      { name: "neural networks", meta: "backprop · activations · optimization", st: "study" },
+      { name: "neural networks", meta: "backprop · activations · optimization", st: "built" },
       { name: "convolutional networks", meta: "convolution · pooling · feature maps", st: "built" },
       { name: "training dynamics", meta: "loss surfaces · learning rate · overfitting", st: "study" },
-      { name: "model export & inference", meta: "weights · precision · parity", st: "built" }
+      { name: "model export & inference", meta: "weights · precision · parity", st: "built" },
+      { name: "from-scratch implementations", meta: "NumPy · no autograd · chain rule", st: "built" },
+      { name: "function approximation", meta: "MLP · Fourier features · Tanh", st: "built" }
     ]
   },
   {
@@ -151,9 +261,11 @@ window.KNOWLEDGE = [
 ];
 
 window.CONNECTIONS = [
-  ["convolution", "number-guesser", "lab[002]"],
-  ["backpropagation", "number-guesser", "lab[003]"],
-  ["matrix multiplication", "number-guesser", "lab[007]"],
+  ["convolution", "number-guesser", "lab[001]"],
+  ["backpropagation", "nn-from-scratch", "lab[002]"],
+  ["gradient descent", "ml-models-from-scratch", "lab[003]"],
+  ["Fourier features", "math-network", "lab[005]"],
+  ["matrix multiplication", "nn-from-scratch", "lab[007]"],
   ["pointers / memory", "number-guesser · C inference", "systems"],
   ["float precision", "number-guesser · parity", "lab[001]"]
 ];
