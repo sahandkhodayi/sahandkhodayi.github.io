@@ -3,17 +3,23 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>YOUR NAME — AI Systems / Low-Level Computing</title>
-  <meta name="description" content="Personal engineering lab. AI/ML, mathematics, C, and systems programming.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230a0b0c'/><circle cx='8' cy='8' r='3.5' fill='none' stroke='%23c98b4b'/></svg>">
+  <title>LARPSOCIETY — Sahand Khodayi</title>
+  <meta name="description" content="LARPSOCIETY — a personal engineering lab exploring AI, mathematics, C, systems, and the layers underneath computers.">
+  <meta name="theme-color" content="#08090a">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%2308090a'/><path d='M3 8h10M8 3v10' stroke='%23c98b4b' stroke-width='1'/></svg>">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
+<div class="system-strip" aria-hidden="true">
+  <span>LARPSOCIETY // PRIVATE COMPUTING CLUB</span>
+  <span>NODE: SAHAND · STATUS: ONLINE</span>
+</div>
+
 <header class="topbar">
   <div class="container topbar-in">
-    <a class="brand" href="#/"><b>~/</b>sahandd</a>
-    <nav class="nav">
+    <a class="brand" href="#/" aria-label="LARPSOCIETY home"><b>larp://</b> society</a>
+    <nav class="nav" aria-label="Main navigation">
       <a href="#/">index</a>
       <a href="#/projects">projects</a>
       <a href="#/lab">lab</a>
@@ -26,19 +32,112 @@
 
 <main id="app"></main>
 
+<div class="terminal" id="terminal" aria-hidden="true">
+  <div class="terminal-window">
+    <div class="terminal-head">
+      <span><i></i><i></i><i></i></span>
+      <span>LARPSOCIETY / shell</span>
+      <button id="terminal-close" type="button" aria-label="Close terminal">×</button>
+    </div>
+    <div class="terminal-body" id="terminal-output">
+      <div>larp://society terminal v0.1</div>
+      <div class="muted">type <b>help</b> for commands · <b>esc</b> to close</div>
+      <br>
+      <div><span class="prompt">sahand@larp:~$</span> whoami</div>
+      <div>sahand — AI / mathematics / systems</div>
+      <div><span class="prompt">sahand@larp:~$</span> motto</div>
+      <div>build it. break it. understand it.</div>
+    </div>
+    <form class="terminal-form" id="terminal-form">
+      <span class="prompt">sahand@larp:~$</span>
+      <input id="terminal-input" autocomplete="off" spellcheck="false" aria-label="Terminal command">
+    </form>
+  </div>
+</div>
+
 <footer>
   <div class="container foot-in">
-    <span>built as a static site · no framework</span>
-    <span>content in markdown → html</span>
+    <span>larpsociety · built as a static site</span>
+    <span>source → github · notes → knowledge · experiments → lab</span>
     <span class="sp">
-      <a href="#" title="replace with your github">github</a> ·
-      <a href="#" title="replace with your email">email</a> ·
-      <a href="#/about">about</a>
+      <a href="https://github.com/sahandkhodayi" target="_blank" rel="noopener">github ↗</a> ·
+      <a href="mailto:sahandkhodayi@gmail.com">email ↗</a> ·
+      <button class="terminal-trigger" id="terminal-open" type="button">terminal</button>
     </span>
   </div>
 </footer>
 
 <script src="data.js"></script>
 <script src="app.js"></script>
+<script>
+  // Small terminal easter egg: presentation only, no network access.
+  (() => {
+    const overlay = document.getElementById('terminal');
+    const input = document.getElementById('terminal-input');
+    const output = document.getElementById('terminal-output');
+    const open = document.getElementById('terminal-open');
+    const close = document.getElementById('terminal-close');
+    const form = document.getElementById('terminal-form');
+
+    const commands = {
+      help: 'commands: help · projects · lab · systems · knowledge · clear · exit',
+      projects: 'opening project index...',
+      lab: 'opening lab...',
+      systems: 'opening systems...',
+      knowledge: 'opening knowledge...',
+      whoami: 'sahand — AI / mathematics / systems',
+      motto: 'build it. break it. understand it.',
+      clear: '__CLEAR__',
+      exit: '__EXIT__'
+    };
+
+    function show() {
+      overlay.classList.add('open');
+      overlay.setAttribute('aria-hidden', 'false');
+      setTimeout(() => input.focus(), 30);
+    }
+    function hide() {
+      overlay.classList.remove('open');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+    function print(text) {
+      const row = document.createElement('div');
+      row.textContent = text;
+      output.appendChild(row);
+      output.scrollTop = output.scrollHeight;
+    }
+
+    open.addEventListener('click', show);
+    close.addEventListener('click', hide);
+    overlay.addEventListener('click', e => { if (e.target === overlay) hide(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') hide(); });
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const cmd = input.value.trim().toLowerCase();
+      if (!cmd) return;
+      print('sahand@larp:~$ ' + cmd);
+      input.value = '';
+      const result = commands[cmd];
+
+      if (result === '__CLEAR__') {
+        output.innerHTML = '';
+        return;
+      }
+      if (result === '__EXIT__') {
+        hide();
+        return;
+      }
+      if (!result) {
+        print('command not found: ' + cmd);
+        return;
+      }
+      print(result);
+      if (['projects','lab','systems','knowledge'].includes(cmd)) {
+        setTimeout(() => { location.hash = '#/' + cmd; hide(); }, 180);
+      }
+    });
+  })();
+</script>
 </body>
 </html>
