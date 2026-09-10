@@ -1,65 +1,65 @@
 window.SITE = {
   name: "sahand khodayi",
   handle: "sahand",
-  identity: "ai / mathematics / systems",
+  identity: "ai / mathematics / c / systems",
   motto: "build it. break it. understand it.",
   github: "https://github.com/sahandkhodayi",
-  email: "sahandkhodayi@gmail.com"
+  email: "kingicebear8585@"
 };
 
 window.PROJECTS = [
   {
     id: "001", slug: "number-guesser", title: "Number Guesser",
-    blurb: "Handwritten digit recognition built as a bridge between ML abstractions and the machine underneath: PyTorch training, exported weights, C inference, and a Python interface.",
-    tags: ["pytorch", "cnn", "c", "mnist", "inference"], status: "active",
-    spec: [["input", "28 × 28 grayscale image"], ["model", "convolutional neural network"], ["training", "PyTorch / Python"], ["export", "state_dict → flat binary weights"], ["inference", "C — forward pass implemented manually"], ["interface", "Python GUI"], ["verification", "PyTorch ↔ C output parity"], ["source", "github.com/sahandkhodayi/Number-Guesser"]],
-    pipeline: [["draw", "handwritten input"], ["preprocess", "crop · resize · center · normalize"], ["train", "PyTorch · conv / pool / linear"], ["export", "trained weights → binary"], ["infer", "C · direct convolution + pooling + linear"], ["verify", "same input → comparable logits"]],
-    questions: ["Can a hand-written C forward pass reproduce the trained PyTorch model?", "Where does numerical drift appear between the two implementations?", "How much of an ML framework is actually needed at inference time?", "How does input preprocessing affect a model trained on MNIST?"],
-    related: ["001", "006"]
+    blurb: "Handwritten digit recognition with PyTorch, CNNs, a Python interface, and a C inference backend.",
+    tags: ["pytorch", "cnn", "c", "mnist"], status: "active",
+    media: "media/number-guesser/",
+    spec: [["input", "28 × 28 grayscale image"], ["model", "convolutional neural network"], ["training", "PyTorch / Python"], ["inference", "C"], ["interface", "Python GUI"], ["source", "github.com/sahandkhodayi/Number-Guesser"]],
+    pipeline: [["draw", "handwritten digit"], ["preprocess", "crop · resize · center"], ["train", "PyTorch CNN"], ["export", "trained weights"], ["infer", "C backend"]],
+    questions: ["Can C reproduce the trained model?", "How much does preprocessing matter?", "What happens between the model and the machine?"], related: ["001", "006"]
   },
   {
-    id: "002", slug: "nn-from-scratch", title: "NN from Scratch with Visuals",
-    blurb: "A neural network framework built with Python and NumPy: forward propagation, backpropagation, gradient descent, and live visualization of the network during training.",
-    tags: ["python", "numpy", "backprop", "visualization", "from-scratch"], status: "built",
-    spec: [["language", "Python + NumPy"], ["components", "neurons · layers · weights · biases"], ["forward", "matrix operations implemented manually"], ["backward", "chain rule + gradient calculation"], ["optimizer", "gradient descent"], ["interface", "interactive GUI playground"], ["visualization", "weights · neuron outputs · decision boundary · loss"], ["source", "github.com/sahandkhodayi/NN-s-from-scratch-with-viuals"]],
-    pipeline: [["build", "define network topology"], ["forward", "propagate values through layers"], ["loss", "measure prediction error"], ["backward", "propagate derivatives"], ["update", "gradient descent"], ["observe", "watch learning happen"]],
-    questions: ["What does backpropagation look like when autograd is removed?", "How does the decision boundary change during training?", "What fails first when the learning rate becomes too large?"], related: ["002", "003"]
+    id: "002", slug: "nn-from-scratch", title: "NN from Scratch",
+    blurb: "A neural network built with Python and NumPy, including forward pass, backpropagation, and gradient descent.",
+    tags: ["python", "numpy", "backprop"], status: "built", media: "media/nn-from-scratch/",
+    spec: [["language", "Python + NumPy"], ["model", "neurons · layers · weights · biases"], ["training", "backpropagation + gradient descent"], ["visuals", "training and network state"], ["source", "github.com/sahandkhodayi/NN-s-from-scratch-with-viuals"]],
+    pipeline: [["build", "network topology"], ["forward", "calculate outputs"], ["loss", "measure error"], ["backward", "calculate gradients"], ["update", "change weights"]],
+    questions: ["How does backprop work without autograd?", "How does the network change while training?"], related: ["002", "003"]
   },
   {
     id: "003", slug: "ml-models-from-scratch", title: "Machine Learning Models",
-    blurb: "Linear and logistic regression implemented from first principles with NumPy, focusing on the mathematics behind optimization instead of hiding it behind a library.",
-    tags: ["python", "numpy", "regression", "optimization", "from-scratch"], status: "built",
-    spec: [["language", "Python + NumPy"], ["linear", "multiple features · normalization · MSE · R²"], ["logistic", "binary classification · sigmoid · cross-entropy"], ["optimization", "gradient descent implemented manually"], ["evaluation", "R² · accuracy · convergence plots"], ["source", "github.com/sahandkhodayi/Machine-learning-Models"]],
-    pipeline: [["data", "load and normalize features"], ["model", "weighted combination of inputs"], ["loss", "MSE / cross-entropy"], ["gradient", "derive parameter updates"], ["update", "gradient descent"], ["evaluate", "measure convergence and fit"]],
-    questions: ["How does normalization change the path of gradient descent?", "Why does logistic regression need the sigmoid function?", "How does learning rate affect convergence?"], related: ["003", "005"]
+    blurb: "Linear and logistic regression implemented with NumPy, focused on the math behind learning.",
+    tags: ["python", "numpy", "regression"], status: "built", media: "media/ml-models-from-scratch/",
+    spec: [["language", "Python + NumPy"], ["models", "linear + logistic regression"], ["loss", "MSE + cross-entropy"], ["optimizer", "gradient descent"], ["source", "github.com/sahandkhodayi/Machine-learning-Models"]],
+    pipeline: [["data", "load features"], ["model", "weighted inputs"], ["loss", "measure error"], ["gradient", "calculate update"], ["evaluate", "measure fit"]],
+    questions: ["How does normalization affect learning?", "Why does logistic regression use sigmoid?"], related: ["003", "005"]
   },
   {
     id: "004", slug: "math-network", title: "Math Network",
-    blurb: "A PyTorch MLP that learns mathematical functions, with Fourier-feature input encoding for functions containing higher-frequency structure.",
-    tags: ["pytorch", "mlp", "fourier", "mathematics"], status: "built",
-    spec: [["framework", "PyTorch"], ["model", "multi-layer perceptron"], ["encoding", "Fourier features: sin / cos"], ["activation", "Tanh"], ["loss", "MSE / L1"], ["optimizer", "SGD"], ["evaluation", "loss · R² · true vs predicted curve"], ["source", "github.com/sahandkhodayi/Math-function-approximation-with-NN"]],
-    pipeline: [["function", "define f(x)"], ["sample", "generate training pairs"], ["encode", "map x into Fourier features"], ["train", "MLP + Tanh"], ["evaluate", "MSE / R²"], ["inspect", "compare learned and true functions"]],
-    questions: ["Why do high-frequency functions challenge a plain MLP?", "What does Fourier feature encoding change about the input space?", "How does model depth affect the learned function?"], related: ["002", "004"]
+    blurb: "A PyTorch network that learns mathematical functions using Fourier-feature inputs.",
+    tags: ["pytorch", "mlp", "fourier"], status: "built", media: "media/math-network/",
+    spec: [["framework", "PyTorch"], ["model", "MLP"], ["encoding", "Fourier features"], ["activation", "Tanh"], ["source", "github.com/sahandkhodayi/Math-function-approximation-with-NN"]],
+    pipeline: [["function", "define f(x)"], ["sample", "generate data"], ["encode", "Fourier features"], ["train", "MLP"], ["inspect", "compare curves"]],
+    questions: ["Why are high-frequency functions harder?", "What changes when the input representation changes?"], related: ["002", "004"]
   }
 ];
 
 window.EXPERIMENTS = [
-  { id: "001", title: "PyTorch → C inference parity", status: "built", tag: "ok", body: "Feed the same inputs through the trained PyTorch model and the hand-written C inference path, then compare logits and intermediate tensors.", spec: [["input", "held-out MNIST samples"], ["metric", "max absolute difference"], ["goal", "find the first divergent layer"], ["state", "reproducible"]] },
-  { id: "002", title: "backpropagation from scratch", status: "built", tag: "ok", body: "Implement the chain rule manually for every trainable layer and visualize the resulting parameter updates.", spec: [["component", "NN from Scratch"], ["method", "manual derivatives"], ["visualization", "weights + neuron outputs"], ["state", "reproducible"]] },
-  { id: "003", title: "gradient descent convergence study", status: "built", tag: "ok", body: "Compare learning rates and optimization behaviour on regression problems implemented without a high-level ML estimator.", spec: [["component", "Machine Learning Models"], ["variants", "gradient descent"], ["metric", "loss vs iteration"], ["state", "reproducible"]] },
-  { id: "004", title: "activation function comparison", status: "planned", tag: "p", body: "Compare ReLU, leaky ReLU, sigmoid, and tanh under the same architecture and initialization.", spec: [["state", "not started"]] },
-  { id: "005", title: "Fourier feature encoding", status: "built", tag: "ok", body: "Compare a plain MLP against Fourier-feature input encoding while approximating increasingly oscillatory functions.", spec: [["component", "Math Network"], ["metric", "MSE · R²"], ["finding", "encoding changes the representation available to the MLP"], ["state", "reproducible"]] },
-  { id: "006", title: "MNIST preprocessing", status: "built", tag: "ok", body: "Study everything between a human stroke and the tensor consumed by the model: scaling, cropping, centering, resizing, and normalization.", spec: [["finding", "hand-drawn input has a different distribution from MNIST"], ["state", "reproducible"]] },
-  { id: "007", title: "matrix multiplication experiments", status: "planned", tag: "p", body: "Naive triple loop → loop reordering → blocked/tiled. Same arithmetic, different memory behaviour.", spec: [["state", "not started"]] }
+  { id: "001", title: "PyTorch → C parity", status: "built", tag: "ok", body: "Run the same input through both implementations and compare the result.", spec: [["metric", "maximum difference"], ["goal", "find mismatches"]] },
+  { id: "002", title: "Backprop from scratch", status: "built", tag: "ok", body: "Implement the chain rule manually and watch the parameters update.", spec: [["method", "manual derivatives"]] },
+  { id: "003", title: "Gradient descent study", status: "built", tag: "ok", body: "Compare learning rates and convergence.", spec: [["metric", "loss vs iteration"]] },
+  { id: "004", title: "Activation comparison", status: "planned", tag: "p", body: "Compare common activation functions under the same setup.", spec: [["state", "not started"]] },
+  { id: "005", title: "Fourier features", status: "built", tag: "ok", body: "Compare a plain MLP with Fourier-feature inputs.", spec: [["metric", "MSE · R²"]] },
+  { id: "006", title: "MNIST preprocessing", status: "built", tag: "ok", body: "Test scaling, cropping, centering, resizing, and normalization.", spec: [["goal", "match MNIST input"]] },
+  { id: "007", title: "Matrix multiplication", status: "planned", tag: "p", body: "Compare simple and cache-friendly implementations.", spec: [["state", "not started"]] }
 ];
 
 window.KNOWLEDGE = [
-  { branch: "AI", count: 12, leaves: [{ name: "neural networks", meta: "backprop · activations · optimization", st: "built" }, { name: "convolutional networks", meta: "convolution · pooling · feature maps", st: "built" }, { name: "training dynamics", meta: "loss · learning rate · overfitting", st: "study" }, { name: "model export & inference", meta: "weights · precision · parity", st: "built" }, { name: "from-scratch implementations", meta: "NumPy · chain rule · manual gradients", st: "built" }, { name: "function approximation", meta: "MLP · Fourier features · Tanh", st: "built" }] },
-  { branch: "mathematics", count: 8, leaves: [{ name: "linear algebra", meta: "vectors · matrices · matrix multiplication", st: "study" }, { name: "calculus", meta: "derivatives · chain rule · gradients", st: "study" }, { name: "probability", meta: "distributions · independence · expectation", st: "study" }, { name: "optimization", meta: "gradient descent · objectives", st: "study" }] },
-  { branch: "systems", count: 10, leaves: [{ name: "C", meta: "pointers · memory · compilation", st: "study" }, { name: "computer architecture", meta: "cpu · cache · assembly", st: "study" }, { name: "memory", meta: "stack · heap · layout · alignment", st: "study" }, { name: "networking", meta: "tcp/ip · sockets", st: "study" }, { name: "tooling", meta: "linux · wsl · git", st: "built" }] }
+  { branch: "AI", count: 12, leaves: [{ name: "neural networks", meta: "models · training", st: "built" }, { name: "CNNs", meta: "convolution · pooling", st: "built" }, { name: "training", meta: "loss · learning rate", st: "study" }, { name: "inference", meta: "weights · deployment", st: "built" }, { name: "from scratch", meta: "NumPy · gradients", st: "built" }] },
+  { branch: "mathematics", count: 8, leaves: [{ name: "linear algebra", meta: "vectors · matrices", st: "study" }, { name: "calculus", meta: "derivatives · gradients", st: "study" }, { name: "probability", meta: "distributions · independence", st: "study" }, { name: "optimization", meta: "gradient descent", st: "study" }] },
+  { branch: "C", count: 10, leaves: [{ name: "language basics", meta: "types · functions · structs", st: "study" }, { name: "pointers", meta: "addresses · dereferencing", st: "study" }, { name: "memory", meta: "stack · heap", st: "study" }, { name: "compilation", meta: "compiler · linker", st: "study" }, { name: "files", meta: "IO · binary data", st: "study" }] },
+  { branch: "systems", count: 10, leaves: [{ name: "computer architecture", meta: "CPU · cache", st: "study" }, { name: "operating systems", meta: "processes · syscalls", st: "study" }, { name: "networking", meta: "TCP/IP · sockets", st: "study" }, { name: "Linux", meta: "shell · tooling", st: "built" }] }
 ];
 
-window.CONNECTIONS = [["convolution", "number-guesser", "lab[001]"], ["backpropagation", "nn-from-scratch", "lab[002]"], ["gradient descent", "ml-models-from-scratch", "lab[003]"], ["Fourier features", "math-network", "lab[005]"], ["matrix multiplication", "nn-from-scratch", "lab[007]"], ["pointers / memory", "number-guesser · C inference", "systems"], ["float precision", "number-guesser · parity", "lab[001]"]];
-
-window.SYSTEMS_TOPICS = [["C", "pointers · manual memory · compilation"], ["memory", "stack · heap · layout · alignment · lifetime"], ["cpu", "registers · instructions · pipelines"], ["cache", "locality · cache lines · memory bandwidth"], ["processes", "address spaces · syscalls · context switches"], ["filesystems", "buffers · files · persistence"], ["networking", "TCP/IP · sockets · packets · protocols"], ["assembly", "what the compiler actually emitted"]];
-window.MEM = { base: 0x7ffd2a10, bytes: [0x2f, 0x00, 0x1a, 0x7f, 0x00, 0x00, 0x00, 0x00, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x00, 0x00, 0x00] };
+window.CONNECTIONS = [["convolution", "number-guesser", "lab[001]"], ["backpropagation", "nn-from-scratch", "lab[002]"], ["gradient descent", "ml-models-from-scratch", "lab[003]"], ["Fourier features", "math-network", "lab[005]"], ["C", "number-guesser", "inference"], ["pointers", "C", "systems"]];
+window.SYSTEMS_TOPICS = [["C", "language · pointers · structs · files"], ["memory", "stack · heap · lifetime"], ["cpu", "registers · instructions"], ["cache", "locality · cache lines"], ["processes", "programs · address spaces"], ["files", "buffers · binary data"], ["networking", "TCP/IP · sockets"], ["Linux", "shell · processes · tools"]];
+window.MEM = { base: 0x7ffd2a10, bytes: [0x2f,0x00,0x1a,0x7f,0x00,0x00,0x00,0x00,0x48,0x65,0x6c,0x6c,0x6f,0x00,0x00,0x00] };

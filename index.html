@@ -4,140 +4,43 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>LARPSOCIETY — Sahand Khodayi</title>
-  <meta name="description" content="LARPSOCIETY — a personal engineering lab exploring AI, mathematics, C, systems, and the layers underneath computers.">
-  <meta name="theme-color" content="#08090a">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%2308090a'/><path d='M3 8h10M8 3v10' stroke='%23c98b4b' stroke-width='1'/></svg>">
+  <meta name="description" content="LARPSOCIETY — a community and portfolio for building, learning, experimenting, and sharing.">
+  <meta name="theme-color" content="#070809">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23070809'/><path d='M3 8h10M8 3v10' stroke='%23c98b4b' stroke-width='1'/></svg>">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-<div class="system-strip" aria-hidden="true">
-  <span>LARPSOCIETY // PRIVATE COMPUTING CLUB</span>
-  <span>NODE: SAHAND · STATUS: ONLINE</span>
-</div>
-
-<header class="topbar">
-  <div class="container topbar-in">
-    <a class="brand" href="#/" aria-label="LARPSOCIETY home"><b>larp://</b> society</a>
-    <nav class="nav" aria-label="Main navigation">
-      <a href="#/">index</a>
-      <a href="#/projects">projects</a>
-      <a href="#/lab">lab</a>
-      <a href="#/knowledge">knowledge</a>
-      <a href="#/systems">systems</a>
-      <a href="#/about">about</a>
-    </nav>
-  </div>
-</header>
+<canvas id="ambient" aria-hidden="true"></canvas>
+<div class="system-strip"><span>LARPSOCIETY // PRIVATE COMPUTING CLUB</span><span>NODE: SAHAND · STATUS: ONLINE · BUILD: 0.2</span></div>
+<header class="topbar"><div class="container topbar-in">
+  <a class="brand" href="#/" aria-label="LARPSOCIETY home"><b>larp://</b> society</a>
+  <nav class="nav" aria-label="Main navigation"><a href="#/">hub</a><a href="#/portfolio">portfolio</a><a href="#/projects">projects</a><a href="#/lab">lab</a><a href="#/knowledge">knowledge</a><a href="#/systems">systems</a></nav>
+  <div class="top-actions"><button id="ambient-toggle" class="icon-btn" type="button">◉</button><button id="terminal-open" class="icon-btn" type="button">&gt;_</button></div>
+</div></header>
 
 <main id="app"></main>
 
-<div class="terminal" id="terminal" aria-hidden="true">
-  <div class="terminal-window">
-    <div class="terminal-head">
-      <span><i></i><i></i><i></i></span>
-      <span>LARPSOCIETY / shell</span>
-      <button id="terminal-close" type="button" aria-label="Close terminal">×</button>
-    </div>
-    <div class="terminal-body" id="terminal-output">
-      <div>larp://society terminal v0.1</div>
-      <div class="muted">type <b>help</b> for commands · <b>esc</b> to close</div>
-      <br>
-      <div><span class="prompt">sahand@larp:~$</span> whoami</div>
-      <div>sahand — AI / mathematics / systems</div>
-      <div><span class="prompt">sahand@larp:~$</span> motto</div>
-      <div>build it. break it. understand it.</div>
-    </div>
-    <form class="terminal-form" id="terminal-form">
-      <span class="prompt">sahand@larp:~$</span>
-      <input id="terminal-input" autocomplete="off" spellcheck="false" aria-label="Terminal command">
-    </form>
-  </div>
-</div>
+<!-- Always-visible mini terminal. The full terminal is still available from >_. -->
+<section class="mini-terminal-wrap"><div class="container"><div class="mini-terminal">
+  <div class="mini-terminal-head"><span><i></i><i></i><i></i></span><b>LARPSOCIETY / terminal</b><span>PUBLIC NODE</span></div>
+  <div class="mini-terminal-body"><span class="prompt">sahand@larp:~$</span> help<br><span class="muted">help · portfolio · projects · lab · knowledge · systems · about · whoami · status</span></div>
+</div></div></section>
 
-<footer>
-  <div class="container foot-in">
-    <span>larpsociety · built as a static site</span>
-    <span>source → github · notes → knowledge · experiments → lab</span>
-    <span class="sp">
-      <a href="https://github.com/sahandkhodayi" target="_blank" rel="noopener">github ↗</a> ·
-      <a href="mailto:sahandkhodayi@gmail.com">email ↗</a> ·
-      <button class="terminal-trigger" id="terminal-open" type="button">terminal</button>
-    </span>
-  </div>
-</footer>
+<div class="terminal" id="terminal" aria-hidden="true"><div class="terminal-window">
+  <div class="terminal-head"><span><i></i><i></i><i></i></span><span>LARPSOCIETY / shell</span><button id="terminal-close" type="button">×</button></div>
+  <div class="terminal-body" id="terminal-output"><div>larp://society terminal v0.2</div><div class="muted">type <b>help</b> for commands · <b>esc</b> to close</div><br><div><span class="prompt">sahand@larp:~$</span> whoami</div><div>sahand — AI / mathematics / C / systems</div><div><span class="prompt">sahand@larp:~$</span> status</div><div>community: online · portfolio: public · experiments: running</div></div>
+  <form class="terminal-form" id="terminal-form"><span class="prompt">sahand@larp:~$</span><input id="terminal-input" autocomplete="off" spellcheck="false" aria-label="Terminal command"></form>
+</div></div>
 
-<script src="data.js"></script>
-<script src="app.js"></script>
+<footer><div class="container foot-in"><span>larpsociety · community + portfolio · static</span><span>source → github · media → projects</span><span class="sp"><a href="https://github.com/sahandkhodayi" target="_blank" rel="noopener">github ↗</a> · <a href="mailto:kingicebear8585@">email ↗</a> · <button class="terminal-trigger" id="terminal-footer" type="button">terminal</button></span></div></footer>
+<script src="data.js"></script><script src="app.js"></script>
 <script>
-  // Small terminal easter egg: presentation only, no network access.
-  (() => {
-    const overlay = document.getElementById('terminal');
-    const input = document.getElementById('terminal-input');
-    const output = document.getElementById('terminal-output');
-    const open = document.getElementById('terminal-open');
-    const close = document.getElementById('terminal-close');
-    const form = document.getElementById('terminal-form');
-
-    const commands = {
-      help: 'commands: help · projects · lab · systems · knowledge · clear · exit',
-      projects: 'opening project index...',
-      lab: 'opening lab...',
-      systems: 'opening systems...',
-      knowledge: 'opening knowledge...',
-      whoami: 'sahand — AI / mathematics / systems',
-      motto: 'build it. break it. understand it.',
-      clear: '__CLEAR__',
-      exit: '__EXIT__'
-    };
-
-    function show() {
-      overlay.classList.add('open');
-      overlay.setAttribute('aria-hidden', 'false');
-      setTimeout(() => input.focus(), 30);
-    }
-    function hide() {
-      overlay.classList.remove('open');
-      overlay.setAttribute('aria-hidden', 'true');
-    }
-    function print(text) {
-      const row = document.createElement('div');
-      row.textContent = text;
-      output.appendChild(row);
-      output.scrollTop = output.scrollHeight;
-    }
-
-    open.addEventListener('click', show);
-    close.addEventListener('click', hide);
-    overlay.addEventListener('click', e => { if (e.target === overlay) hide(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') hide(); });
-
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      const cmd = input.value.trim().toLowerCase();
-      if (!cmd) return;
-      print('sahand@larp:~$ ' + cmd);
-      input.value = '';
-      const result = commands[cmd];
-
-      if (result === '__CLEAR__') {
-        output.innerHTML = '';
-        return;
-      }
-      if (result === '__EXIT__') {
-        hide();
-        return;
-      }
-      if (!result) {
-        print('command not found: ' + cmd);
-        return;
-      }
-      print(result);
-      if (['projects','lab','systems','knowledge'].includes(cmd)) {
-        setTimeout(() => { location.hash = '#/' + cmd; hide(); }, 180);
-      }
-    });
-  })();
-</script>
-</body>
-</html>
+(()=>{
+const overlay=document.getElementById('terminal'),input=document.getElementById('terminal-input'),output=document.getElementById('terminal-output'),open=document.getElementById('terminal-open'),footer=document.getElementById('terminal-footer'),close=document.getElementById('terminal-close'),form=document.getElementById('terminal-form');
+const commands={help:'commands: help · hub · portfolio · projects · lab · knowledge · systems · about · whoami · status · clear · date · source · contact · exit',hub:'returning to LARPSOCIETY hub...',portfolio:'opening Sahand portfolio...',projects:'opening project index...',lab:'opening lab...',knowledge:'opening knowledge...',systems:'opening systems...',about:'opening LARPSOCIETY / Sahand...',whoami:'sahand — AI / mathematics / C / systems',status:'community: online · portfolio: public · experiments: running',date:new Date().toString(),source:'github.com/sahandkhodayi/sahandkhodayi.github.io',contact:'kingicebear8585@',clear:'__CLEAR__',exit:'__EXIT__'};
+function show(){overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');setTimeout(()=>input.focus(),30)} function hide(){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true')} function print(t){const r=document.createElement('div');r.textContent=t;output.appendChild(r);output.scrollTop=output.scrollHeight}
+open.onclick=show;footer.onclick=show;close.onclick=hide;overlay.onclick=e=>{if(e.target===overlay)hide()};document.addEventListener('keydown',e=>{if(e.key==='Escape')hide();if(e.key==='`'&&!e.ctrlKey&&!e.metaKey){e.preventDefault();show()}});
+form.onsubmit=e=>{e.preventDefault();const cmd=input.value.trim().toLowerCase();if(!cmd)return;print('sahand@larp:~$ '+cmd);input.value='';const result=commands[cmd];if(result==='__CLEAR__'){output.innerHTML='';return}if(result==='__EXIT__'){hide();return}if(!result){print('command not found: '+cmd);return}print(result);const routes={hub:'#/',portfolio:'#/portfolio',projects:'#/projects',lab:'#/lab',knowledge:'#/knowledge',systems:'#/systems',about:'#/about'};if(routes[cmd])setTimeout(()=>{location.hash=routes[cmd];hide()},180)};
+const canvas=document.getElementById('ambient'),ctx=canvas.getContext('2d'),toggle=document.getElementById('ambient-toggle');let particles=[],running=true;const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;function resize(){canvas.width=innerWidth*devicePixelRatio;canvas.height=innerHeight*devicePixelRatio;canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);particles=Array.from({length:Math.min(70,Math.floor(innerWidth/20))},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-.5)*.14,vy:(Math.random()-.5)*.14,r:Math.random()*1.2+.25}))}function draw(){ctx.clearRect(0,0,innerWidth,innerHeight);for(const p of particles){p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=innerWidth;if(p.x>innerWidth)p.x=0;if(p.y<0)p.y=innerHeight;if(p.y>innerHeight)p.y=0;ctx.fillStyle='rgba(201,139,75,.28)';ctx.fillRect(p.x,p.y,p.r,p.r)}if(running&&!reduced)requestAnimationFrame(draw)}resize();addEventListener('resize',resize);draw();toggle.onclick=()=>{running=!running;toggle.classList.toggle('off',!running);if(running&&!reduced)draw()};
+})();
+</script></body></html>
