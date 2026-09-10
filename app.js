@@ -6,7 +6,7 @@ const { PROJECTS, EXPERIMENTS, KNOWLEDGE, CONNECTIONS, SYSTEMS_TOPICS, MEM } = w
 
 const h = (s) => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
-function specList(rows){
+function specList(rows){ 
   return `<dl class="spec">${rows.map(([k,v])=>`
     <div class="spec-row"><dt>${h(k)}</dt><dd>${h(v)}</dd></div>`).join("")}</dl>`;
 }
