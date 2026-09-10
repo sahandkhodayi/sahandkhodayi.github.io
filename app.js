@@ -44,7 +44,7 @@ function Home(){
           down to the C that runs it and the memory it touches.
         </p>
         <div class="hero-meta">
-          <span class="hl">YOUR NAME</span>
+          <span class="hl">SAHAND KHODAYI</span>
           <span class="sep">·</span>
           <span>AI / ML</span>
           <span class="sep">·</span>
@@ -70,15 +70,8 @@ function Home(){
 
     <section class="sec">
       <div class="container">
-        <div class="sec-h"><h2>selected work</h2><span class="line"></span><span class="n">01 entry</span></div>
+        <div class="sec-h"><h2>selected work</h2><span class="line"></span><span class="n">04 entries</span></div>
         ${PROJECTS.map(projectEntry).join("")}
-        <article class="entry entry--empty">
-          <div class="entry-id">[002]</div>
-          <div class="entry-body">
-            <h3 class="entry-title">— reserved —</h3>
-            <p class="entry-desc">Next entry. Added when it's built, not before.</p>
-          </div>
-        </article>
         <div class="linkrow"><a class="btn" href="#/projects">all projects →</a></div>
       </div>
     </section>
@@ -102,8 +95,8 @@ function Home(){
             <div class="panel-b">
               ${specList([
                 ["number guesser","PyTorch ↔ C inference parity"],
-                ["lab[002]","convolution from scratch"],
-                ["lab[003]","gradient descent experiments"]
+                ["nn from scratch","backprop from scratch + visuals"],
+                ["math network","Fourier features for function approximation"]
               ])}
             </div>
           </div>
@@ -149,22 +142,20 @@ function Projects(){
   return `
   <div class="view">
     <section class="sec container">
-      <div class="sec-h"><h2>projects</h2><span class="line"></span><span class="n">01 entry · 01 reserved</span></div>
+      <div class="sec-h"><h2>projects</h2><span class="line"></span><span class="n">04 entries</span></div>
       <p class="lede dim mb">Things I have actually built and can explain from the top of the stack to the bottom.</p>
       ${PROJECTS.map(projectEntry).join("")}
-      <article class="entry entry--empty">
-        <div class="entry-id">[002]</div>
-        <div class="entry-body">
-          <h3 class="entry-title">— reserved —</h3>
-          <p class="entry-desc">Next entry. Added when it's built, not before.</p>
-        </div>
-      </article>
     </section>
   </div>`;
 }
 
-function ProjectNumberGuesser(){
-  const p = PROJECTS[0];
+function ProjectDetail(){
+  const slug = currentPath().split("/")[2];
+  const p = PROJECTS.find(x => x.slug === slug);
+  if (!p) return NotFound();
+
+  const relatedExps = EXPERIMENTS.filter(e => p.related.includes(e.id));
+
   return `
   <div class="view">
     <section class="sec container">
@@ -172,16 +163,16 @@ function ProjectNumberGuesser(){
       <h1 style="font-size:clamp(19px,3vw,26px);margin-top:16px">${h(p.title)}</h1>
       <p class="lede" style="margin-top:14px">${h(p.blurb)}</p>
       <div class="entry-tags" style="margin-top:18px">
-        <span class="tag a">built</span>
+        <span class="tag a">${h(p.status)}</span>
         ${p.tags.map(t=>`<span class="tag">${h(t)}</span>`).join("")}
       </div>
     </section>
 
     <section class="sec">
       <div class="container">
-        <div class="sec-h"><h2>specification</h2><span class="line"></span><span class="n">[001]</span></div>
+        <div class="sec-h"><h2>specification</h2><span class="line"></span><span class="n">[${p.id}]</span></div>
         <div class="panel">
-          <div class="panel-h">number-guesser <span class="r">v1</span></div>
+          <div class="panel-h">${p.slug} <span class="r">v1</span></div>
           <div class="panel-b">${specList(p.spec)}</div>
         </div>
       </div>
@@ -189,7 +180,7 @@ function ProjectNumberGuesser(){
 
     <section class="sec">
       <div class="container">
-        <div class="sec-h"><h2>pipeline</h2><span class="line"></span><span class="n">stroke → prediction</span></div>
+        <div class="sec-h"><h2>pipeline</h2><span class="line"></span><span class="n">flow</span></div>
         <ol class="chain">
           ${p.pipeline.map(([t,d])=>`<li><span class="t">${h(t)}</span><span class="d">${h(d)}</span></li>`).join("")}
         </ol>
@@ -217,53 +208,38 @@ function ProjectNumberGuesser(){
         <div class="grid-2">
           <div class="panel">
             <div class="panel-h">above the abstraction</div>
-            <div class="panel-b">${specList([
-              ["mathematics","convolution as a linear operator"],
-              ["model","CNN · conv / pool / fully connected"],
-              ["framework","PyTorch autograd + training loop"],
-              ["data","MNIST · preprocessing · normalization"]
-            ])}</div>
+            <div class="panel-b">${specList(p.spec.slice(0, Math.ceil(p.spec.length/2)))}</div>
           </div>
           <div class="panel">
             <div class="panel-h">below the abstraction</div>
-            <div class="panel-b">${specList([
-              ["language","C — no ML libraries"],
-              ["memory","weights as a flat float buffer"],
-              ["arithmetic","float32 accumulation order"],
-              ["verification","logit-by-logit diff vs PyTorch"]
-            ])}</div>
+            <div class="panel-b">${specList(p.spec.slice(Math.ceil(p.spec.length/2)))}</div>
           </div>
         </div>
       </div>
     </section>
 
+    ${relatedExps.length ? `
     <section class="sec">
       <div class="container">
-        <div class="sec-h"><h2>related</h2><span class="line"></span><span class="n">notes & experiments</span></div>
-        <div class="grid-2">
-          <div class="panel">
-            <div class="panel-h">experiments</div>
-            <div class="panel-b">
-              ${EXPERIMENTS.filter(e=>p.related.includes(e.id)).map(e=>`
-                <div style="display:flex;gap:14px;align-items:baseline;padding:7px 0">
-                  <span style="color:var(--fg-4);font-size:11px">[${e.id}]</span>
-                  <a href="#/lab" style="border:0;color:var(--fg-2);font-size:12.5px">${h(e.title)}</a>
-                  <span class="tag ${e.tag}" style="margin-left:auto">${h(e.status)}</span>
-                </div>`).join("")}
-            </div>
-          </div>
-          <div class="panel">
-            <div class="panel-h">notes</div>
-            <div class="panel-b">${specList([
-              ["convolution","kernel · stride · padding · feature maps"],
-              ["backpropagation","chain rule through conv + fc layers"],
-              ["float precision","why parity isn't bit-exact"],
-              ["memory layout","row-major tensors in C"]
-            ])}</div>
+        <div class="sec-h"><h2>related</h2><span class="line"></span><span class="n">experiments</span></div>
+        <div class="panel">
+          <div class="panel-h">lab entries</div>
+          <div class="panel-b">
+            ${relatedExps.map(e=>`
+              <div style="display:flex;gap:14px;align-items:baseline;padding:7px 0">
+                <span style="color:var(--fg-4);font-size:11px">[${e.id}]</span>
+                <a href="#/lab" style="border:0;color:var(--fg-2);font-size:12.5px">${h(e.title)}</a>
+                <span class="tag ${e.tag}" style="margin-left:auto">${h(e.status)}</span>
+              </div>`).join("")}
           </div>
         </div>
+      </div>
+    </section>` : ""}
+
+    <section class="sec">
+      <div class="container">
         <div class="linkrow">
-          <a class="btn solid" href="#">source ↗</a>
+          <a class="btn solid" href="${p.spec.find(s=>s[0]==="source")?.[1] ? "https://"+p.spec.find(s=>s[0]==="source")[1] : "#"}" target="_blank" rel="noopener">source ↗</a>
           <a class="btn" href="#/knowledge">technical notes</a>
           <a class="btn" href="#/lab">experiments</a>
         </div>
@@ -459,8 +435,10 @@ function About(){
             <div class="panel-h">built</div>
             <div class="panel-b">${specList([
               ["number guesser","CNN → C inference, verified"],
-              ["tooling","linux · wsl · git"],
-              ["python","numpy · pytorch"]
+              ["nn from scratch","forward + backward + GUI visuals"],
+              ["ml models","linear & logistic regression from scratch"],
+              ["math network","MLP + Fourier features for function approximation"],
+              ["tooling","linux · wsl · git"]
             ])}</div>
           </div>
           <div class="panel">
@@ -484,8 +462,8 @@ function About(){
           <div class="panel">
             <div class="panel-h">contact</div>
             <div class="panel-b">${specList([
-              ["github","github.com/you"],
-              ["email","you@example.com"],
+              ["github","github.com/sahandkhodayi"],
+              ["email","your@email.com"],
               ["notes","published selectively on /knowledge"]
             ])}</div>
           </div>
@@ -514,7 +492,6 @@ function NotFound(){
 const ROUTES = {
   "/": Home,
   "/projects": Projects,
-  "/projects/number-guesser": ProjectNumberGuesser,
   "/lab": Lab,
   "/knowledge": Knowledge,
   "/systems": Systems,
@@ -531,7 +508,14 @@ function currentPath(){
 
 function render(){
   const path = currentPath();
-  const view = ROUTES[path] || NotFound;
+  let view;
+
+  if (path.startsWith("/projects/") && path !== "/projects") {
+    view = ProjectDetail;
+  } else {
+    view = ROUTES[path] || NotFound;
+  }
+
   app.innerHTML = view();
 
   document.querySelectorAll(".nav a").forEach(a => {
@@ -547,7 +531,7 @@ function render(){
 }
 
 /* ============================================================
-   MOUNT HOOKS (interactive bits)
+   MOUNT HOOKS
    ============================================================ */
 
 function mount(){
@@ -573,10 +557,6 @@ function mount(){
 
   paint();
 }
-
-/* ============================================================
-   BOOT
-   ============================================================ */
 
 window.addEventListener("hashchange", render);
 render();
