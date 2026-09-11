@@ -92,8 +92,6 @@ window.CONNECTIONS = [["convolution", "number-guesser", "lab[001]"], ["backpropa
 window.SYSTEMS_TOPICS = [["C", "language · pointers · structs · files"], ["memory", "stack · heap · lifetime"], ["cpu", "registers · instructions"], ["cache", "locality · cache lines"], ["processes", "programs · address spaces"], ["files", "buffers · binary data"], ["networking", "TCP/IP · sockets"], ["Linux", "shell · processes · tools"], ["OSINT", "recon · footprinting · public records"]];
 window.MEM = { base: 0x7ffd2a10, bytes: [0x2f,0x00,0x1a,0x7f,0x00,0x00,0x00,0x00,0x48,0x65,0x6c,0x6c,0x6f,0x00,0x00,0x00] };
 
-// Recent activity — a real, single-author log, not a fake multi-user feed.
-// Add a line here whenever you actually ship or log something.
 window.ACTIVITY = [
   { who: "sahand", verb: "logged", target: "lab[001] — PyTorch → C inference parity", ref: "#/lab" },
   { who: "sahand", verb: "shipped", target: "Number Guesser — C inference backend", ref: "#/projects/number-guesser" },
@@ -101,49 +99,19 @@ window.ACTIVITY = [
   { who: "sahand", verb: "wrote", target: "Machine Learning Models — regression from scratch", ref: "#/projects/ml-models-from-scratch" }
 ];
 
-// A dossier, not a member directory — this is one operator's file, styled
-// like a case record. Kept as an array/shape in case that's ever untrue,
-// but the copy never pretends it's more than one person today.
-window.MEMBERS = [
-  {
-    handle: "sahand",
-    name: "Sahand Khodayi",
-    role: "operator",
-    clearance: "root",
-    identity: "ai / mathematics / c / systems / osint",
-    status: "active",
-    focus: ["pytorch", "cnn", "c", "numpy"],
-    link: "#/portfolio"
-  }
+window.MEMBERS = [{
+  handle: "sahand", name: "Sahand Khodayi", role: "operator", clearance: "root",
+  identity: "ai / mathematics / c / systems / osint", status: "active",
+  focus: ["pytorch", "cnn", "c", "numpy"], link: "#/portfolio"
+}];
+
+window.NEWS = [
+  { id: "003", tag: "osint", title: "Starting point: passive recon methodology", date: "2026-09-10", body: "TODO — replace with your actual write-up: passive vs active collection, first tools/sources you're working through, what you're testing them against.", ref: null },
+  { id: "002", tag: "systems", title: "Why the inference path had to leave PyTorch", date: "2026-08-XX", body: "TODO — the real story behind moving Number Guesser's forward pass to C: what broke first, what you had to learn about memory layout to fix it.", ref: "#/projects/number-guesser" },
+  { id: "001", tag: "ai", title: "lab[001] closed: PyTorch ↔ C parity", date: "2026-08-XX", body: "TODO — summarize the actual result: tolerance achieved, what mismatched first, what fixed it.", ref: "#/lab" }
 ];
 
-// Dispatches — a real feed you publish into, not a placeholder for other
-// people's submissions. Uploads/accounts from other users need a backend
-// (auth, storage, moderation) — a genuinely separate build from this static
-// site; this is yours to write in the meantime.
-window.NEWS = [
-  {
-    id: "003",
-    tag: "osint",
-    title: "Starting point: passive recon methodology",
-    date: "2026-09-10",
-    body: "TODO — replace with your actual write-up: passive vs active collection, first tools/sources you're working through, what you're testing them against.",
-    ref: null
-  },
-  {
-    id: "002",
-    tag: "systems",
-    title: "Why the inference path had to leave PyTorch",
-    date: "2026-08-XX",
-    body: "TODO — the real story behind moving Number Guesser's forward pass to C: what broke first, what you had to learn about memory layout to fix it.",
-    ref: "#/projects/number-guesser"
-  },
-  {
-    id: "001",
-    tag: "ai",
-    title: "lab[001] closed: PyTorch \u2194 C parity",
-    date: "2026-08-XX",
-    body: "TODO — summarize the actual result: tolerance achieved, what mismatched first, what fixed it.",
-    ref: "#/lab"
-  }
-];
+// Load the interactive network layer after the page is ready.
+const nodeScript = document.createElement('script');
+nodeScript.src = 'nodes.js';
+document.head.appendChild(nodeScript);
