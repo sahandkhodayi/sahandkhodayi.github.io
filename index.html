@@ -17,30 +17,98 @@
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--fg);font:13px/1.6 var(--mono);font-variant-ligatures:none;-webkit-font-smoothing:antialiased;overflow:hidden}
 
-/* ---- background layers ---- */
-.wall{position:fixed;inset:0;z-index:0;background:var(--bg);overflow:hidden}
-.wall img{position:absolute;width:100%;height:100%;object-fit:cover;opacity:.06;filter:brightness(.55) saturate(.5) blur(3px)}
+/* ============================================================
+   LAYER 0 — INTRO IMAGE (starts full screen, sinks into bg)
+   ============================================================ */
+.intro{
+  position:fixed;inset:0;z-index:30;
+  background:#000;overflow:hidden;
+  transition:opacity 1.4s cubic-bezier(.6,0,.3,1);
+}
+.intro.gone{opacity:0;pointer-events:none}
+.intro img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;
+  transform:scale(1.02);
+  filter:brightness(.55) saturate(.85);
+  animation:introZoom 6s cubic-bezier(.2,.6,.3,1) forwards;
+}
+@keyframes introZoom{
+  from{transform:scale(1.02);filter:brightness(.55) saturate(.85)}
+  to  {transform:scale(1.22);filter:brightness(.2) saturate(.5) blur(2px)}
+}
+.intro::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 50%,transparent 20%,rgba(0,0,0,.35) 60%,rgba(0,0,0,.85) 100%);
+}
+.intro .flash{
+  position:absolute;inset:0;background:var(--bg);
+  opacity:0;pointer-events:none;
+  transition:opacity 1.2s ease .3s;
+}
+.intro.gone .flash{opacity:1}
+
+/* ============================================================
+   LAYER 1 — WALL (dim blurred background, same images)
+   ============================================================ */
+.wall{
+  position:fixed;inset:0;z-index:0;background:var(--bg);overflow:hidden;
+  opacity:0;transition:opacity 1.6s ease;
+}
+.wall.on{opacity:1}
+.wall img{
+  position:absolute;width:100%;height:100%;object-fit:cover;
+  opacity:.07;filter:brightness(.55) saturate(.5) blur(3px);
+}
 .wall img:last-child{opacity:.04;mix-blend-mode:screen}
-.wall::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,rgba(7,8,9,.72) 0%,rgba(7,8,9,.94) 45%,var(--bg) 75%)}
+.wall::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 45%,rgba(7,8,9,.72) 0%,rgba(7,8,9,.94) 45%,var(--bg) 75%);
+}
 
-canvas#network{position:fixed;inset:0;z-index:1;width:100%;height:100%;pointer-events:auto}
+/* ============================================================
+   LAYER 2 — INTERACTIVE NODE NETWORK
+   ============================================================ */
+canvas#network{
+  position:fixed;inset:0;z-index:1;width:100%;height:100%;pointer-events:auto;
+  opacity:0;transition:opacity 1.6s ease;
+}
+canvas#network.on{opacity:1}
 
-.vignette{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(circle at 50% 45%,transparent 20%,rgba(0,0,0,.4) 60%,rgba(0,0,0,.92) 100%)}
+/* ============================================================
+   OVERLAYS
+   ============================================================ */
+.vignette{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0;transition:opacity 1.8s ease;
+  background:radial-gradient(circle at 50% 45%,transparent 20%,rgba(0,0,0,.4) 60%,rgba(0,0,0,.92) 100%)}
+.vignette.on{opacity:1}
 
-.scan{position:fixed;inset:0;z-index:4;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(201,139,75,.025) 0,rgba(201,139,75,.025) 1px,transparent 1px,transparent 3px);opacity:.6;mix-blend-mode:screen;overflow:hidden}
-.scan::after{content:"";position:absolute;left:0;right:0;height:120px;background:linear-gradient(180deg,transparent,rgba(201,139,75,.06),transparent);animation:sweep 7s linear infinite}
+.scan{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:0;transition:opacity 1.8s ease;
+  background:repeating-linear-gradient(0deg,rgba(201,139,75,.025) 0,rgba(201,139,75,.025) 1px,transparent 1px,transparent 3px);
+  mix-blend-mode:screen;overflow:hidden}
+.scan.on{opacity:.7}
+.scan::after{content:"";position:absolute;left:0;right:0;height:120px;
+  background:linear-gradient(180deg,transparent,rgba(201,139,75,.06),transparent);
+  animation:sweep 7s linear infinite}
 @keyframes sweep{from{top:-120px}to{top:100%}}
 
-.noise{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence baseFrequency='.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.5'/></svg>");mix-blend-mode:overlay}
+.noise{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:0;transition:opacity 1.8s ease;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence baseFrequency='.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.5'/></svg>");
+  mix-blend-mode:overlay}
+.noise.on{opacity:.05}
 
-/* ---- chrome ---- */
-.sys-strip{position:fixed;left:0;right:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:0 22px;height:26px;color:var(--fg4);font-size:9px;letter-spacing:.18em;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+/* ============================================================
+   SYSTEM STRIPS
+   ============================================================ */
+.sys-strip{position:fixed;left:0;right:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:0 22px;height:26px;color:var(--fg4);font-size:9px;letter-spacing:.18em;text-transform:uppercase;white-space:nowrap;overflow:hidden;opacity:0;transform:translateY(-4px);transition:opacity .8s ease,transform .8s ease}
 .sys-strip.top{top:0;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(7,8,9,.85),rgba(7,8,9,0))}
-.sys-strip.bot{bottom:0;border-top:1px solid var(--line);background:linear-gradient(0deg,rgba(7,8,9,.85),rgba(7,8,9,0))}
+.sys-strip.bot{bottom:0;border-top:1px solid var(--line);background:linear-gradient(0deg,rgba(7,8,9,.85),rgba(7,8,9,0));transform:translateY(4px)}
+.sys-strip.on{opacity:1;transform:translateY(0)}
 .sys-strip .dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--ok);margin-right:7px;vertical-align:middle;box-shadow:0 0 6px rgba(131,168,106,.6);animation:pulse 2.4s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
-/* ---- stage ---- */
+/* ============================================================
+   STAGE + TERMINAL
+   ============================================================ */
 .stage{position:relative;z-index:5;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:44px 22px}
 
 .terminal{
@@ -49,13 +117,15 @@ canvas#network{position:fixed;inset:0;z-index:1;width:100%;height:100%;pointer-e
   background:linear-gradient(180deg,rgba(11,13,15,.92),rgba(7,8,9,.96));
   box-shadow:0 30px 90px rgba(0,0,0,.7),0 0 0 1px rgba(201,139,75,.04),0 0 60px rgba(201,139,75,.05),inset 0 0 80px rgba(201,139,75,.015);
   backdrop-filter:blur(3px);
-  position:relative;
-  overflow:hidden;
+  position:relative;overflow:hidden;
+  opacity:0;transform:translateY(22px) scale(.985);
+  transition:opacity 1s cubic-bezier(.3,.7,.3,1),transform 1s cubic-bezier(.3,.7,.3,1);
 }
+.terminal.on{opacity:1;transform:translateY(0) scale(1)}
 .terminal::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent2),transparent);opacity:.7}
 
 /* boot overlay */
-.boot{position:absolute;inset:0;z-index:9;background:var(--bg);padding:22px 26px;color:var(--fg2);font-size:11px;line-height:1.95;transition:opacity .5s ease;overflow:hidden}
+.boot{position:absolute;inset:0;z-index:9;background:var(--bg);padding:22px 26px;color:var(--fg2);font-size:11px;line-height:1.95;transition:opacity .55s ease;overflow:hidden}
 .boot.done{opacity:0;pointer-events:none}
 .boot .b-line{opacity:0;animation:bootIn .22s ease forwards}
 .boot .b-line .ok{color:var(--ok)}
@@ -76,7 +146,6 @@ canvas#network{position:fixed;inset:0;z-index:1;width:100%;height:100%;pointer-e
 
 /* body */
 .t-body{padding:30px 32px 28px}
-
 .prompt{color:var(--fg3);font-size:11px}
 .prompt .user{color:var(--accent)}
 .prompt .path{color:var(--fg2)}
@@ -87,9 +156,7 @@ canvas#network{position:fixed;inset:0;z-index:1;width:100%;height:100%;pointer-e
 .wordmark::after{content:"";position:absolute;left:0;bottom:-8px;width:56px;height:2px;background:var(--accent)}
 
 .tag{color:var(--fg3);font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;margin-top:14px}
-
 .rule{height:1px;background:linear-gradient(90deg,var(--line2),transparent);margin:26px 0 22px}
-
 .label{display:flex;justify-content:space-between;align-items:baseline;color:var(--fg4);font-size:9px;letter-spacing:.22em;text-transform:uppercase}
 .label .r{color:var(--fg3);letter-spacing:.1em}
 
@@ -101,14 +168,12 @@ canvas#network{position:fixed;inset:0;z-index:1;width:100%;height:100%;pointer-e
 .num.warm{color:var(--accent3);text-shadow:0 0 22px rgba(201,139,75,.4)}
 .unit small{display:block;margin-top:8px;color:var(--fg4);font-size:8px;letter-spacing:.22em;text-transform:uppercase}
 
-/* progress */
 .prog{margin-top:22px}
 .prog .bar{height:3px;background:var(--line);position:relative;overflow:hidden}
 .prog .fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .5s ease;box-shadow:0 0 10px rgba(201,139,75,.5)}
 .prog .meta{display:flex;justify-content:space-between;color:var(--fg4);font-size:9px;letter-spacing:.16em;margin-top:8px;text-transform:uppercase}
 .prog .meta b{color:var(--accent);font-weight:500}
 
-/* status row */
 .status{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:22px;padding-top:20px;border-top:1px solid var(--line);color:var(--fg3);font-size:10px;letter-spacing:.1em}
 .status .k{color:var(--fg4);text-transform:uppercase;letter-spacing:.18em;font-size:9px;display:block;margin-bottom:3px}
 .status .v{color:var(--fg);font-size:11px}
@@ -116,19 +181,18 @@ canvas#network{position:fixed;inset:0;z-index:1;width:100%;height:100%;pointer-e
 .status .v.ok{color:var(--ok)}
 .status .v .blink{display:inline-block;width:8px;height:11px;background:var(--accent);vertical-align:-2px;margin-left:5px;animation:blink 1.1s steps(2) infinite}
 
-/* footer inside terminal */
 .t-foot{display:flex;justify-content:space-between;padding:11px 15px;border-top:1px solid var(--line);color:var(--fg4);font-size:9px;letter-spacing:.14em;text-transform:uppercase;background:rgba(7,8,9,.5)}
 .t-foot .ac{color:var(--accent2)}
-
 @keyframes blink{50%{opacity:0}}
 
-/* ---- responsive ---- */
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 @media(max-width:640px){
   .stage{padding:80px 14px 60px}
   .t-body{padding:24px 18px}
   .wordmark{font-size:38px;letter-spacing:.1em}
   .count{grid-template-columns:repeat(2,1fr);gap:8px}
-  .status{gap:8px}
   .status>div{flex:1 1 42%}
   .sys-strip{padding:0 14px;font-size:8px}
   .sys-strip.top span:nth-child(2),
@@ -138,28 +202,44 @@ canvas#network{position:fixed;inset:0;z-index:1;width:100%;height:100%;pointer-e
   .wordmark{font-size:30px}
   .num{font-size:26px}
 }
+@media(prefers-reduced-motion:reduce){
+  .intro img{animation:none}
+  .scan::after{animation:none}
+}
 </style>
 </head>
 <body>
 
-<div class="wall" aria-hidden="true">
+<!-- LAYER 0 — INTRO IMAGE (full screen, sinks into background) -->
+<div class="intro" id="intro" aria-hidden="true">
+  <img src="media/countdown/photo-01.svg" alt="">
+  <div class="flash"></div>
+</div>
+
+<!-- LAYER 1 — DIM BLURRED WALL -->
+<div class="wall" id="wall" aria-hidden="true">
   <img src="media/countdown/photo-01.svg" alt="">
   <img src="media/countdown/photo-02.svg" alt="">
 </div>
 
+<!-- LAYER 2 — INTERACTIVE NODE NETWORK -->
 <canvas class="network" id="network" aria-label="Interactive network background"></canvas>
-<div class="vignette"></div>
-<div class="noise"></div>
-<div class="scan"></div>
 
-<div class="sys-strip top">
+<!-- Overlays -->
+<div class="vignette" id="vignette"></div>
+<div class="noise" id="noise"></div>
+<div class="scan" id="scan"></div>
+
+<!-- System strips -->
+<div class="sys-strip top" id="strip-top">
   <span><span class="dot"></span>LARPSOCIETY · PUBLIC NODE</span>
   <span>BUILD 0.0.1</span>
   <span id="uptime">UPTIME 00:00:00</span>
 </div>
 
+<!-- MAIN STAGE -->
 <main class="stage">
-  <section class="terminal" aria-label="LARPSOCIETY release countdown">
+  <section class="terminal" id="terminal" aria-label="LARPSOCIETY release countdown">
 
     <div class="boot" id="boot" aria-hidden="true"></div>
 
@@ -214,19 +294,79 @@ canvas#network{position:fixed;inset:0;z-index:1;width:100%;height:100%;pointer-e
   </section>
 </main>
 
-<div class="sys-strip bot">
+<div class="sys-strip bot" id="strip-bot">
   <span>© LARPSOCIETY // 2026</span>
   <span>NODE-04 · LAT 35.68 / LON 51.38</span>
   <span>ALL SIGNALS MONITORED</span>
 </div>
 
 <script>
-/* ===================== config ===================== */
-const RELEASE = new Date('2026-09-23T00:00:00+03:30').getTime();
-const START   = RELEASE - 12 * 86400000;      /* 12 days before release */
-const pad     = n => String(Math.max(0, n)).padStart(2, '0');
+/* ============================================================
+   TIMELINE — tune the intro here
+   ============================================================ */
+const TL = {
+  holdMs:     1900,   // intro image sits full-screen, zooming
+  revealMs:   1400,   // cross-fade duration (intro → wall)
+  nodeDelay:   350,   // nodes start fading in after reveal starts
+  terminalMs:  700,   // terminal starts appearing after reveal starts
+  stripMs:     500,   // system strips appear
+  removeMs:   3600,   // when to remove intro node entirely
+  bootDelay:  1500    // when boot lines start (after terminal appears)
+};
 
-/* ===================== boot sequence ===================== */
+/* ============================================================
+   CONFIG
+   ============================================================ */
+const RELEASE = new Date('2026-09-23T00:00:00+03:30').getTime();
+const START   = RELEASE - 12 * 86400000;
+const pad     = n => String(Math.max(0, n)).padStart(2, '0');
+const reduce  = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ============================================================
+   INTRO SEQUENCE
+   ============================================================ */
+function playIntro() {
+  const intro = document.getElementById('intro');
+  const layers = [
+    ['wall',      TL.nodeDelay],
+    ['network',   TL.nodeDelay + 200],
+    ['vignette',  TL.nodeDelay + 400],
+    ['noise',     TL.nodeDelay + 500],
+    ['scan',      TL.nodeDelay + 500],
+    ['strip-top', TL.stripMs],
+    ['strip-bot', TL.stripMs]
+  ];
+
+  if (reduce) {
+    // Skip animation, jump straight to final state
+    intro.remove();
+    document.querySelectorAll('.wall,canvas,vignette,.noise,.scan,.sys-strip,.terminal')
+      .forEach(el => el.classList.add('on'));
+    document.getElementById('terminal').classList.add('on');
+    return;
+  }
+
+  // t = 0 : intro zooms
+  // t = holdMs : begin reveal
+  setTimeout(() => {
+    intro.classList.add('gone');
+    layers.forEach(([id, delay]) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      setTimeout(() => el.classList.add('on'), delay);
+    });
+    // Terminal appears slightly later than the wall
+    setTimeout(() => document.getElementById('terminal').classList.add('on'), TL.terminalMs);
+    // Remove intro node once faded
+    setTimeout(() => intro.remove(), TL.removeMs);
+    // Boot lines
+    setTimeout(runBoot, TL.terminalMs + TL.bootDelay);
+  }, TL.holdMs);
+}
+
+/* ============================================================
+   BOOT SEQUENCE (inside terminal)
+   ============================================================ */
 const bootLines = [
   ['[00.00]', 'initializing public node', ''],
   ['[00.12]', 'loading kernel modules', 'ok'],
@@ -235,11 +375,8 @@ const bootLines = [
   ['[00.58]', 'mounting /release_countdown', 'ok'],
   ['[01.00]', 'armed. awaiting release.', '']
 ];
-const bootEl = document.getElementById('boot');
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
 function runBoot() {
-  if (reduceMotion) { bootEl.classList.add('done'); return; }
+  const bootEl = document.getElementById('boot');
   bootLines.forEach((line, i) => {
     setTimeout(() => {
       const [t, msg, status] = line;
@@ -250,10 +387,12 @@ function runBoot() {
       bootEl.appendChild(div);
     }, i * 180);
   });
-  setTimeout(() => bootEl.classList.add('done'), bootLines.length * 180 + 600);
+  setTimeout(() => bootEl.classList.add('done'), bootLines.length * 180 + 700);
 }
 
-/* ===================== countdown ===================== */
+/* ============================================================
+   COUNTDOWN
+   ============================================================ */
 const daysEl   = document.getElementById('days');
 const hoursEl  = document.getElementById('hours');
 const minsEl   = document.getElementById('mins');
@@ -300,7 +439,9 @@ function tick() {
     : `T-minus ${hours}h ${pad(mins)}m`;
 }
 
-/* ===================== uptime ===================== */
+/* ============================================================
+   UPTIME
+   ============================================================ */
 const uptimeEl = document.getElementById('uptime');
 const bootAt   = Date.now();
 function uptimeTick() {
@@ -311,7 +452,9 @@ function uptimeTick() {
     pad(s % 60);
 }
 
-/* ===================== network canvas (amber) ===================== */
+/* ============================================================
+   NETWORK CANVAS (amber nodes, interactive)
+   ============================================================ */
 const canvas = document.getElementById('network');
 const ctx    = canvas.getContext('2d');
 let W, H, dpr, nodes = [], mouse = { x: -9999, y: -9999 }, drag = null;
@@ -412,14 +555,16 @@ function frame() {
   requestAnimationFrame(frame);
 }
 
-/* ===================== init ===================== */
+/* ============================================================
+   INIT
+   ============================================================ */
 resize(); seed();
-runBoot();
 tick();
 setInterval(tick, 250);
 setInterval(uptimeTick, 1000);
 uptimeTick();
 requestAnimationFrame(frame);
+playIntro();
 </script>
 </body>
 </html>
