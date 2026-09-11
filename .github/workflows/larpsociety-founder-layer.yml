@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/larpsociety-founder-layer.yml'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -15,125 +16,297 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Replace founder discovery layer
+      - name: Inject founder discovery layer
         shell: python
         run: |
           from pathlib import Path
-          import re
+          import sys
 
           path = Path('index.html')
+          if not path.exists():
+              sys.exit('index.html not found — nothing to inject into.')
           html = path.read_text(encoding='utf-8')
 
-          injection = r'''
+          START_MARK = '<!-- LARP:FOUNDER:START -->'
+          END_MARK   = '<!-- LARP:FOUNDER:END -->'
+
+          # ---- Idempotent removal of any previous injection -------------
+          # Simple, reliable string slicing. No regex. No over-matching.
+          safety = 0
+          while START_MARK in html and END_MARK in html:
+              s = html.index(START_MARK)
+              e = html.index(END_MARK, s) + len(END_MARK)
+              html = html[:s] + html[e:]
+              safety += 1
+              if safety > 10:
+                  sys.exit('Refusing to loop — markers found more than 10×.')
+
+          # ---- The founder layer ----------------------------------------
+          block = START_MARK + r'''
 <style id="larp-founder-style">
 /* ============================================================
-   LARPSOCIETY // FOUNDER DISCOVERY v2
-   The founder should be impossible to miss.
+   LARPSOCIETY // FOUNDER DISCOVERY v3
+   Amber-palette, marker-safe, no duplicates.
    ============================================================ */
+
 #larp-founder-layer{
-  position:fixed;left:clamp(22px,6vw,92px);top:50%;z-index:30;
-  width:min(430px,calc(100vw - 44px));
-  transform:translateY(-42%) translateX(-22px);
-  opacity:0;filter:blur(8px);
+  position:fixed;
+  left:clamp(28px,7vw,104px);
+  top:50%;
+  z-index:30;
+  width:min(438px,calc(100vw - 56px));
+  transform:translateY(-44%) translateX(-26px);
+  opacity:0;
+  filter:blur(10px);
   pointer-events:none;
   font-family:"Courier New",monospace;
   color:#e8b57a;
-  transition:opacity 1s ease,transform 1.15s cubic-bezier(.16,.7,.3,1),filter 1.15s ease;
+  transition:
+    opacity 1.05s ease,
+    transform 1.25s cubic-bezier(.16,.7,.3,1),
+    filter 1.2s ease;
 }
 #larp-founder-layer.found-visible{
-  opacity:1;transform:translateY(-42%) translateX(0);filter:none;
+  opacity:1;
+  transform:translateY(-44%) translateX(0);
+  filter:none;
 }
+
 .larp-founder-card{
-  position:relative;padding:22px 24px 20px;
+  position:relative;
+  padding:24px 26px 22px 28px;
+  border:1px solid rgba(201,139,75,.22);
   border-left:2px solid #c98b4b;
-  border-top:1px solid rgba(201,139,75,.38);
-  border-right:1px solid rgba(201,139,75,.16);
-  border-bottom:1px solid rgba(201,139,75,.16);
-  background:linear-gradient(110deg,rgba(7,8,9,.92),rgba(7,8,9,.66),rgba(20,15,9,.34));
-  box-shadow:0 24px 90px rgba(0,0,0,.72),0 0 45px rgba(201,139,75,.10),inset 18px 0 45px rgba(201,139,75,.025);
-  backdrop-filter:blur(10px);
+  background:
+    linear-gradient(110deg,
+      rgba(7,8,9,.94) 0%,
+      rgba(7,8,9,.72) 45%,
+      rgba(20,15,9,.36) 100%);
+  box-shadow:
+    0 28px 100px rgba(0,0,0,.78),
+    0 0 55px rgba(201,139,75,.10),
+    inset 22px 0 55px rgba(201,139,75,.03);
+  backdrop-filter:blur(12px);
   overflow:hidden;
 }
+
+/* giant 001 watermark */
 .larp-founder-card::before{
-  content:"001";position:absolute;right:-12px;bottom:-34px;
-  font-size:150px;font-weight:700;line-height:1;color:rgba(201,139,75,.045);
-  letter-spacing:-.08em;pointer-events:none;
+  content:"001";
+  position:absolute;
+  right:-14px;bottom:-42px;
+  font-size:170px;font-weight:700;line-height:1;
+  color:rgba(201,139,75,.045);
+  letter-spacing:-.09em;
+  pointer-events:none;
 }
+
+/* microscanline */
 .larp-founder-card::after{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background:repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(255,255,255,.018) 4px);
+  content:"";
+  position:absolute;inset:0;
+  pointer-events:none;
+  background:repeating-linear-gradient(
+    0deg,transparent 0,transparent 3px,rgba(255,255,255,.016) 4px);
 }
+
+/* one-shot scan sweep on reveal */
+.larp-founder-scan{
+  position:absolute;left:0;right:0;top:0;height:0;
+  pointer-events:none;
+  background:linear-gradient(180deg,
+    transparent,
+    rgba(201,139,75,.22),
+    transparent);
+  opacity:0;
+}
+#larp-founder-layer.found-visible .larp-founder-scan{
+  animation:larpScanOnce 1.4s ease-out forwards;
+}
+@keyframes larpScanOnce{
+  0%  {opacity:1;height:0}
+  60% {opacity:1;height:100%}
+  100%{opacity:0;height:100%}
+}
+
+/* corner ticks (small, frames the card) */
+.larp-founder-card .tick{
+  position:absolute;width:10px;height:10px;
+  border-color:rgba(201,139,75,.55);
+}
+.larp-founder-card .tick.tl{top:6px;left:6px;border-top:1px solid;border-left:1px solid}
+.larp-founder-card .tick.tr{top:6px;right:6px;border-top:1px solid;border-right:1px solid}
+.larp-founder-card .tick.bl{bottom:6px;left:6px;border-bottom:1px solid;border-left:1px solid}
+.larp-founder-card .tick.br{bottom:6px;right:6px;border-bottom:1px solid;border-right:1px solid}
+
+/* header */
 .larp-founder-top{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
-  font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:#806c57;
+  font-size:8px;letter-spacing:.28em;text-transform:uppercase;
+  color:#806c57;position:relative;
 }
 .larp-founder-label{color:#c98b4b;font-weight:700}
 .larp-founder-status{display:flex;align-items:center;gap:7px;color:#b39a7d}
 .larp-founder-status i{
-  width:6px;height:6px;border-radius:50%;background:#c98b4b;
-  box-shadow:0 0 12px rgba(201,139,75,.95);animation:larpFounderPulse 1.6s ease-in-out infinite;
+  width:6px;height:6px;border-radius:50%;
+  background:#c98b4b;
+  box-shadow:0 0 12px rgba(201,139,75,.95);
+  animation:larpFounderPulse 1.6s ease-in-out infinite;
 }
-@keyframes larpFounderPulse{50%{opacity:.25;transform:scale(.65)}}
+@keyframes larpFounderPulse{
+  50%{opacity:.25;transform:scale(.65)}
+}
+
+/* the loud "FOUND" label */
 .larp-founder-found{
-  margin-top:18px;font-size:clamp(10px,1vw,13px);letter-spacing:.5em;
-  color:#c98b4b;text-transform:uppercase;text-shadow:0 0 16px rgba(201,139,75,.35);
+  margin-top:20px;
+  font-size:clamp(10px,1vw,13px);
+  letter-spacing:.55em;
+  color:#c98b4b;
+  text-transform:uppercase;
+  text-shadow:0 0 18px rgba(201,139,75,.4);
+  position:relative;
 }
+
+/* name */
 .larp-founder-name{
-  position:relative;margin:5px 0 3px;
-  font-size:clamp(27px,3.3vw,43px);line-height:1.02;
-  font-weight:700;letter-spacing:.075em;color:#f0c893;
-  text-shadow:0 0 20px rgba(201,139,75,.32),0 0 55px rgba(201,139,75,.12);
+  position:relative;
+  margin:6px 0 4px;
+  font-size:clamp(28px,3.4vw,44px);
+  line-height:1.02;
+  font-weight:700;
+  letter-spacing:.075em;
+  color:#f0c893;
+  text-shadow:
+    0 0 22px rgba(201,139,75,.35),
+    0 0 60px rgba(201,139,75,.14);
 }
+
 .larp-founder-sub{
-  font-size:9px;letter-spacing:.25em;color:#8f765d;text-transform:uppercase;
+  font-size:9px;letter-spacing:.26em;
+  color:#8f765d;text-transform:uppercase;
 }
+
 .larp-founder-rule{
-  height:1px;margin:18px 0 15px;
+  height:1px;margin:20px 0 16px;
   background:linear-gradient(90deg,#c98b4b,rgba(201,139,75,.24),transparent);
 }
+
 .larp-founder-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:11px 25px;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:12px 26px;
   font-size:8px;letter-spacing:.16em;text-transform:uppercase;
 }
 .larp-founder-grid div{color:#62513f}
-.larp-founder-grid b{display:block;margin-top:4px;color:#d0b28c;font-weight:400;letter-spacing:.12em}
+.larp-founder-grid b{
+  display:block;margin-top:4px;
+  color:#d0b28c;font-weight:400;letter-spacing:.12em;
+}
+
 .larp-founder-quote{
-  margin-top:18px;color:#9a8065;font-size:9px;line-height:1.5;letter-spacing:.12em;
+  margin-top:20px;
+  color:#9a8065;font-size:9px;line-height:1.5;letter-spacing:.12em;
 }
 .larp-founder-quote::before{content:"> ";color:#c98b4b}
-.larp-signal{
-  position:fixed;left:50%;bottom:20px;z-index:31;transform:translateX(-50%);
-  white-space:nowrap;color:rgba(201,139,75,.55);
-  font:7px/1 "Courier New",monospace;letter-spacing:.32em;text-transform:uppercase;
-  opacity:0;transition:opacity .7s ease;text-shadow:0 0 12px rgba(201,139,75,.2);
+
+/* signal-strength bars */
+.larp-founder-bars{
+  margin-top:16px;
+  display:flex;gap:4px;align-items:flex-end;height:14px;
 }
-.larp-signal.visible{opacity:1}
+.larp-founder-bars span{
+  display:block;width:3px;background:#c98b4b;
+  opacity:.55;
+  animation:larpBars 2.4s ease-in-out infinite;
+}
+.larp-founder-bars span:nth-child(1){height:20%;animation-delay:0s}
+.larp-founder-bars span:nth-child(2){height:45%;animation-delay:.2s}
+.larp-founder-bars span:nth-child(3){height:70%;animation-delay:.4s}
+.larp-founder-bars span:nth-child(4){height:90%;animation-delay:.6s}
+.larp-founder-bars span:nth-child(5){height:100%;animation-delay:.8s}
+@keyframes larpBars{
+  0%,100%{opacity:.35;transform:scaleY(.75)}
+  50%    {opacity:1;transform:scaleY(1)}
+}
+
+/* transmission toast */
+.larp-signal{
+  position:fixed;left:50%;bottom:82px;z-index:31;
+  transform:translateX(-50%) translateY(6px);
+  white-space:nowrap;
+  color:rgba(232,181,122,.72);
+  font:7px/1 "Courier New",monospace;
+  letter-spacing:.34em;text-transform:uppercase;
+  opacity:0;
+  transition:opacity .7s ease,transform .7s ease;
+  text-shadow:0 0 14px rgba(201,139,75,.35);
+  pointer-events:none;
+}
+.larp-signal.visible{
+  opacity:1;transform:translateX(-50%) translateY(0);
+}
+.larp-signal::before,
+.larp-signal::after{
+  content:"◆";color:#c98b4b;opacity:.55;margin:0 12px;
+}
+
+/* reveal flash — from the left edge */
 .larp-founder-flash{
   position:fixed;inset:0;z-index:29;pointer-events:none;opacity:0;
-  background:radial-gradient(circle at 18% 50%,rgba(201,139,75,.16),transparent 35%);
+  background:radial-gradient(
+    circle at 14% 50%,
+    rgba(201,139,75,.18),
+    rgba(201,139,75,.06) 22%,
+    transparent 42%);
 }
-.larp-founder-flash.fire{animation:larpFounderFlash .7s ease-out}
-@keyframes larpFounderFlash{0%{opacity:0}20%{opacity:1}100%{opacity:0}}
-@media(max-width:800px){
-  #larp-founder-layer{left:18px;right:18px;top:auto;bottom:62px;width:auto;transform:translateY(18px)}
+.larp-founder-flash.fire{animation:larpFounderFlash .9s ease-out}
+@keyframes larpFounderFlash{
+  0%  {opacity:0}
+  18% {opacity:1}
+  100%{opacity:0}
+}
+
+/* ---- responsive ---- */
+@media(max-width:900px){
+  #larp-founder-layer{
+    left:20px;right:20px;
+    top:auto;bottom:104px;
+    width:auto;
+    transform:translateY(20px);
+  }
   #larp-founder-layer.found-visible{transform:translateY(0)}
-  .larp-founder-card{padding:16px 17px 15px}
-  .larp-founder-name{font-size:25px}
-  .larp-founder-found{margin-top:12px}
-  .larp-founder-rule{margin:12px 0}
-  .larp-founder-grid{gap:7px 15px;font-size:7px}
-  .larp-founder-quote{margin-top:12px}
+  .larp-founder-card{padding:18px 18px 16px 20px}
+  .larp-founder-name{font-size:24px;letter-spacing:.06em}
+  .larp-founder-found{margin-top:13px;letter-spacing:.42em}
+  .larp-founder-rule{margin:14px 0 11px}
+  .larp-founder-grid{gap:8px 16px;font-size:7px}
+  .larp-founder-quote{margin-top:13px;font-size:8px}
+  .larp-founder-bars{display:none}
   .larp-signal{display:none}
 }
+
 @media(prefers-reduced-motion:reduce){
-  #larp-founder-layer{transition:opacity .2s ease;transform:translateY(-42%)}
-  #larp-founder-layer.found-visible{transform:translateY(-42%)}
-  .larp-founder-status i{animation:none}
+  #larp-founder-layer{
+    transition:opacity .25s ease;
+    transform:translateY(-44%);
+    filter:none;
+  }
+  #larp-founder-layer.found-visible{transform:translateY(-44%)}
+  .larp-founder-status i,
+  .larp-founder-bars span,
+  .larp-founder-scan{animation:none !important}
+  .larp-founder-flash.fire{animation:none}
 }
 </style>
 
 <div id="larp-founder-layer" aria-label="Founder discovered">
   <div class="larp-founder-card">
+    <span class="tick tl"></span>
+    <span class="tick tr"></span>
+    <span class="tick bl"></span>
+    <span class="tick br"></span>
+    <div class="larp-founder-scan"></div>
+
     <div class="larp-founder-top">
       <span class="larp-founder-label">// NODE DISCOVERY</span>
       <span class="larp-founder-status"><i></i>LOCKED</span>
@@ -149,6 +322,9 @@ jobs:
       <div>CLEARANCE<b>ROOT</b></div>
     </div>
     <div class="larp-founder-quote">he built the door.</div>
+    <div class="larp-founder-bars" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
   </div>
 </div>
 
@@ -157,57 +333,69 @@ jobs:
 
 <script id="larp-founder-script">
 (function(){
-  const founder=document.getElementById('larp-founder-layer');
-  const signal=document.getElementById('larp-signal');
-  const flash=document.getElementById('larp-founder-flash');
-  if(!founder)return;
+  var founder = document.getElementById('larp-founder-layer');
+  var signal  = document.getElementById('larp-signal');
+  var flash   = document.getElementById('larp-founder-flash');
+  if (!founder) return;
 
-  const messages=[
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var messages = [
     'TRANSMISSION // FOUNDER NODE 001 DISCOVERED',
     'SIGNAL // SAHAND KHODAIE // CONFIRMED',
     'NODE // 001 // BUILDER SIGNATURE LOCKED',
     'LARPSOCIETY // FIRST SIGNAL ACQUIRED'
   ];
-  let i=0;
+  var i = 0;
 
   function reveal(){
     founder.classList.add('found-visible');
-    if(flash){flash.classList.remove('fire');void flash.offsetWidth;flash.classList.add('fire');}
-    setTimeout(()=>signal&&signal.classList.add('visible'),500);
+    if (flash && !reduce) {
+      flash.classList.remove('fire');
+      void flash.offsetWidth;      /* force reflow so animation restarts */
+      flash.classList.add('fire');
+    }
+    setTimeout(function(){
+      if (signal) signal.classList.add('visible');
+    }, 520);
   }
 
-  // Countdown gets the first beat. Then the founder is deliberately obvious.
-  setTimeout(reveal,4200);
+  /* Wait until the terminal has morphed into the HUD and the
+     background has finished revealing, THEN drop the founder card.
+     Terminal morphs at 4.3s; background finishes at ~7s. We go at 6.4s. */
+  if (reduce) {
+    reveal();
+  } else {
+    setTimeout(reveal, 6400);
+  }
 
-  setInterval(()=>{
-    if(!signal)return;
-    i=(i+1)%messages.length;
-    signal.textContent=messages[i];
+  /* Rotate the transmission toast every 4.6s */
+  setInterval(function(){
+    if (!signal) return;
+    i = (i + 1) % messages.length;
+    signal.textContent = messages[i];
     signal.classList.remove('visible');
-    setTimeout(()=>signal.classList.add('visible'),90);
-  },4600);
+    setTimeout(function(){ signal.classList.add('visible'); }, 90);
+  }, 4600);
 
-  // Hidden local Easter egg: F toggles the founder node.
-  window.addEventListener('keydown',e=>{
-    if(e.key.toLowerCase()==='f'){
+  /* Local Easter egg: press F to toggle the founder node */
+  window.addEventListener('keydown', function(e){
+    if (e.key && e.key.toLowerCase() === 'f') {
       founder.classList.toggle('found-visible');
-      if(signal)signal.classList.toggle('visible');
+      if (signal) signal.classList.toggle('visible');
     }
   });
 })();
 </script>
-'''
+''' + END_MARK
 
-          # Remove the previous generated founder layer, if one exists.
-          html = re.sub(r'\n<style id="larp-founder-style">.*?<script id="larp-founder-script">.*?</script>\n', '\n', html, count=1, flags=re.S)
-          html = re.sub(r'\n<div id="larp-founder-layer".*?</div>\n\s*<div id="larp-signal".*?</div>\n\s*<div id="larp-founder-flash".*?</div>\n', '\n', html, count=1, flags=re.S)
-
+          # ---- Insert before </body> ------------------------------------
           marker = '</body>'
           if marker not in html:
-              raise SystemExit('Could not find </body> in index.html')
-          html = html.replace(marker, injection + '\n' + marker, 1)
+              sys.exit('</body> not found in index.html — nothing to inject into.')
+          html = html.replace(marker, block + '\n' + marker, 1)
           path.write_text(html, encoding='utf-8')
-          print('Founder discovery v2 injected.')
+          print('Founder discovery v3 injected cleanly.')
 
       - name: Commit injected page
         run: |
@@ -217,6 +405,6 @@ jobs:
           if git diff --cached --quiet; then
             echo 'No changes to commit.'
           else
-            git commit -m 'feat: make founder discovery unmistakable'
+            git commit -m 'feat: founder discovery layer v3'
             git push
           fi
