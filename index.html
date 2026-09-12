@@ -3,23 +3,73 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>LARPSOCIETY — come play with the web</title>
-  <meta name="description" content="LARPSOCIETY — a playful community hub for experiments, projects, people, and ideas on the web.">
-  <meta name="theme-color" content="#0b0b0f">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230b0b0f'/><circle cx='32' cy='32' r='15' fill='none' stroke='%23ff5c8a' stroke-width='4'/><circle cx='32' cy='32' r='4' fill='%23ff5c8a'/></svg>">
+  <title>LARPSOCIETY :: fsociety terminal</title>
+  <meta name="description" content="LARPSOCIETY — an underground clubhouse for experiments, projects, people, and ideas on the web.">
+  <meta name="theme-color" content="#0a0603">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' fill='%230a0603'/><text x='50%25' y='58%25' font-family='monospace' font-size='52' fill='%23ff8c00' text-anchor='middle'>$</text></svg>">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="grain"></div>
-  <header class="topbar">
-    <a class="logo" href="#/">LARP<span>●</span>SOCIETY</a>
-    <nav><a href="#/discover">discover</a><a href="#/lab">lab</a><a href="#/people">people</a><a href="#/projects">projects</a><a href="#/forum">forum</a><a href="#/news">news</a><a class="sahand-link" href="#/sahand">sahand ↗</a></nav>
-    <button id="menu" class="menu" aria-label="menu">☰</button>
-  </header>
 
-  <main id="app"></main>
+  <!-- CRT overlays -->
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+  <div class="crt"></div>
 
-  <footer><div><b>LARP●SOCIETY</b><span>an internet clubhouse for curious people</span></div><div><a href="#/sahand">Sahand's portfolio</a><a href="https://github.com/sahandkhodayi" target="_blank" rel="noopener">GitHub ↗</a></div></footer>
+  <!-- boot screen -->
+  <div id="boot" class="boot">
+    <pre id="boot-text" class="boot-text"></pre>
+  </div>
+
+  <!-- main shell -->
+  <div id="shell" class="shell" hidden>
+    <header class="topbar">
+      <a class="logo" href="#/">LARP<span>●</span>SOCIETY</a>
+      <nav id="nav">
+        <a href="#/discover">discover</a>
+        <a href="#/lab">lab</a>
+        <a href="#/people">people</a>
+        <a href="#/projects">projects</a>
+        <a href="#/forum">forum</a>
+        <a href="#/news">news</a>
+        <a class="sahand-link" href="#/sahand">sahand ↗</a>
+      </nav>
+      <div class="topbar-right">
+        <span class="status-dot" title="online"></span>
+        <span class="clock" id="clock">--:--:--</span>
+        <button id="menu" class="menu" aria-label="menu" aria-expanded="false">≡</button>
+      </div>
+    </header>
+
+    <main id="app"></main>
+
+    <footer>
+      <div class="footer-left">
+        <span>└─[ LARP●SOCIETY ]─[ an internet clubhouse for curious people ]</span>
+      </div>
+      <div class="footer-right">
+        <a href="#/sahand">sahand</a>
+        <a href="https://github.com/sahandkhodayi" target="_blank" rel="noopener">github ↗</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- command palette -->
+  <div id="palette" class="palette" hidden>
+    <div class="palette-box" role="dialog" aria-modal="true" aria-label="command palette">
+      <div class="palette-bar">
+        <span class="prompt">root@larpsociety:~$</span>
+        <input id="palette-input" placeholder="run a command…  (lab, people, sahand, github)" autocomplete="off" spellcheck="false">
+      </div>
+      <div id="palette-list" class="palette-list"></div>
+      <div class="palette-foot">
+        <span data-act="up">[↑] up</span>
+        <span data-act="down">[↓] down</span>
+        <span data-act="run">[↵] run</span>
+        <button type="button" class="pal-btn" data-act="close">[esc] close</button>
+      </div>
+    </div>
+  </div>
 
   <script src="data.js"></script>
   <script src="app.js"></script>
