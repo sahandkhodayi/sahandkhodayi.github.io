@@ -1,0 +1,47 @@
+name: Join LARPSOCIETY
+description: Send a request to join the society.
+title: "[JOIN] "
+labels:
+  - "join-request"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## LARPSOCIETY // JOIN REQUEST
+
+        Welcome. This is the little form that starts your presence in the society.
+
+  - type: input
+    id: handle
+    attributes:
+      label: Handle
+      description: Your GitHub username is attached automatically. Give yourself a handle if you want one.
+      placeholder: e.g. sahand
+    validations:
+      required: true
+
+  - type: textarea
+    id: interests
+    attributes:
+      label: What are you into?
+      description: Coding, art, math, games, hardware, music, weird experiments — anything.
+      placeholder: Tell us what you like building, learning, or messing with.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Why do you want in?
+      description: No résumé required. Just give us a sentence or two.
+      placeholder: I found this place because...
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: One last thing
+      options:
+        - label: I understand this request is public because it is stored as a GitHub issue.
+          required: true
