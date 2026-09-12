@@ -534,7 +534,7 @@ document.addEventListener('click', e => {
 });
 
 /* ============================================================
-   BOOT
+   BOOTloader
    ============================================================ */
 window.addEventListener('hashchange', render);
 
