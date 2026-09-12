@@ -1,5 +1,5 @@
 /* ============================================================
-   LARPSOCIETY — fsociety terminal (bulletproof boot)
+   LARPSOCIETY — fsociety terminal + entry breach game
    ============================================================ */
 const SITE       = window.SITE       || { handle:'sahand', motto:'build it. break it. understand it.' };
 const PROJECTS   = window.PROJECTS   || [];
@@ -14,41 +14,355 @@ const JOIN_URL = `https://github.com/${GITHUB_REPO}/issues/new?title=%5BJOIN%5D%
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 /* ============================================================
-   BOOT SEQUENCE — always finishes within ~3s, skippable
+   ENTRY GAME — fsociety breach
+   puzzle: ls → cat readme.txt → chmod +x key.sh → ./key.sh → unlock fsociety
    ============================================================ */
-const BOOT_LINES = [
-  "LARPSOCIETY BIOS v2.7  (C) 1997-2024  [fsociety build]",
-  "",
-  "Memory test ...................... 640K OK",
-  "Detecting primary controller .....",
-  "  > NEURAL-9 CPU @ 4.77 MHz      [OK]",
-  "  > CACHE 8KB                    [OK]",
-  "  > MODEM 56K                    [OK]",
-  "  > VGA 80x25 COLOR              [OK]",
-  "",
-  "Loading LARPSOCIETY.OS ..........",
-  "Mounting /dev/curiosity ......... [OK]",
-  "Mounting /dev/lab ............... [OK]",
-  "Mounting /dev/people ............ [OK]",
-  "Mounting /dev/projects .......... [OK]",
-  "",
-  "Starting fsociety protocol ......",
-  "",
-  ">> WELCOME, FRIEND.",
-  ">> press / or ctrl+k to run a command.",
-  ">> click around. nothing is sacred.",
-  ""
+const GAME = {
+  keyExecutable: false,
+  wrong: 0,
+  hintIndex: 0,
+  solved: false
+};
+
+const DOOR_KEY = 'fsociety';
+
+const FILES = {
+  'readme.txt': `LARPSOCIETY // readme
+---------------------
+the door is locked. you need a key.
+there is a script in this directory that can generate one.
+
+find it. make it runnable. run it. then unlock the door.
+
+quick commands:
+  ls             list files
+  cat <file>     read a file
+  chmod +x <f>   make a file executable
+  ./<file>       run an executable
+  unlock <key>   unlock the door`,
+  'door.lock': `=== door.lock ===
+status: LOCKED
+hint:   unlock <key>`,
+  'key.sh': `#!/bin/bash
+# key.sh — generates the door key
+echo "KEY = ${DOOR_KEY}"`
+};
+
+const HINTS = [
+  "try: ls",
+  "read a file: cat readme.txt",
+  "make the script executable: chmod +x key.sh",
+  "run the script: ./key.sh",
+  "use the key: unlock " + DOOR_KEY,
+  "or just type: skip"
 ];
 
-let bootSkipped = false;
+const INTRO = [
+  { t: 'LARPSOCIETY BREACH PROTOCOL v1.0', c: 'muted' },
+  { t: '========================================', c: 'muted' },
+  { t: '' },
+  { t: 'user:   guest' },
+  { t: 'host:   larpsociety-node-01' },
+  { t: 'status: ', h: 'DOOR LOCKED', c: 'warn' },
+  { t: '' },
+  { t: 'you have been dropped into a shell.' },
+  { t: 'the door to larpsociety is locked.' },
+  { t: 'find a way in.' },
+  { t: '' },
+  { t: "type 'help' for commands, or 'skip' to bypass.", c: 'muted' },
+  { t: '' }
+];
+
+function logLine(html, cls){
+  const log = document.getElementById('game-log');
+  if (!log) return;
+  const d = document.createElement('div');
+  d.className = 'game-line' + (cls ? ' ' + cls : '');
+  d.innerHTML = html;
+  log.appendChild(d);
+  log.scrollTop = log.scrollHeight;
+}
+
+async function introSeq(){
+  for (const line of INTRO){
+    if (GAME.solved) return;
+    if (line.h){
+      logLine(esc(line.t) + '<b class="ok">' + esc(line.h) + '</b>', line.c);
+    } else if (line.t === ''){
+      logLine('');
+    } else {
+      logLine(esc(line.t), line.c);
+    }
+    await sleep(55);
+  }
+  focusInput();
+}
+
+function focusInput(){
+  const i = document.getElementById('game-input');
+  if (i) try { i.focus(); } catch(e){}
+}
+
+function nextHint(){
+  if (GAME.hintIndex >= HINTS.length){
+    logLine('no more hints. type: skip', 'muted');
+    return;
+  }
+  logLine('<span class="game-hint-mark">?</span> ' + esc(HINTS[GAME.hintIndex]), 'hint');
+  GAME.hintIndex++;
+}
+
+function gameSolve(){
+  if (GAME.solved) return;
+  GAME.solved = true;
+  logLine('');
+  logLine('>> ACCESS GRANTED', 'ok big');
+  logLine('');
+  try { sessionStorage.setItem('larp_breached', '1'); } catch(e){}
+  setTimeout(() => finishBoot(), 800);
+}
+
+function gameCmd(raw){
+  const input = String(raw || '').trim();
+  if (!input) return;
+  if (GAME.solved) return;
+
+  // echo
+  logLine('<span class="game-user">guest@larpsociety:~$</span> ' + esc(input), 'echo');
+
+  const parts = input.split(/\s+/);
+  const cmd = parts[0].toLowerCase();
+  const rest = parts.slice(1).join(' ');
+
+  // ---- help ----
+  if (cmd === 'help' || cmd === '?'){
+    logLine('available commands:', 'muted');
+    logLine('  ls               list files');
+    logLine('  cat <file>       read a file');
+    logLine('  chmod +x <file>  make a file executable');
+    logLine('  ./<file>         run an executable');
+    logLine('  unlock <key>     unlock the door');
+    logLine('  hint             show next hint');
+    logLine('  clear            clear the screen');
+    logLine('  skip             bypass the intro');
+    logLine('  whoami           who are you?');
+    return;
+  }
+
+  // ---- clear ----
+  if (cmd === 'clear' || cmd === 'cls'){
+    const log = document.getElementById('game-log');
+    if (log) log.innerHTML = '';
+    return;
+  }
+
+  // ---- hint ----
+  if (cmd === 'hint' || cmd === 'hints'){
+    return nextHint();
+  }
+
+  // ---- skip ----
+  if (cmd === 'skip' || cmd === 'exit' || cmd === 'quit' || cmd === 'q'){
+    return finishBoot();
+  }
+
+  // ---- misc ----
+  if (cmd === 'whoami'){
+    logLine("you are 'guest'. but you could be more.", 'muted');
+    return;
+  }
+  if (cmd === 'pwd'){
+    logLine('/home/guest');
+    return;
+  }
+  if (cmd === 'date'){
+    logLine(new Date().toString());
+    return;
+  }
+  if (cmd === 'echo'){
+    logLine(esc(rest) || '');
+    return;
+  }
+  if (cmd === 'sudo'){
+    logLine('guest is not in the sudoers file. this incident will be reported.', 'warn');
+    return;
+  }
+  if (cmd === 'rm' || cmd === 'rmdir'){
+    logLine('nice try.', 'muted');
+    return;
+  }
+  if (cmd === 'man'){
+    logLine('there is no man page. only the door.', 'muted');
+    return;
+  }
+  if (cmd === 'hack' || cmd === 'hacktheplanet'){
+    logLine("it's not that kind of movie.", 'muted');
+    return;
+  }
+  if (cmd === 'matrix'){
+    logLine('wake up, neo...', 'muted');
+    return;
+  }
+  if (cmd === 'fsociety'){
+    logLine('close. but you need the door key first.', 'muted');
+    return;
+  }
+  if (cmd === 'hello' || cmd === 'hi' || cmd === 'hey'){
+    logLine('hello, friend.', 'muted');
+    return;
+  }
+  if (cmd === 'root'){
+    logLine('not yet.', 'muted');
+    return;
+  }
+  if (cmd === 'key'){
+    logLine("try: cat key.sh  (or ./key.sh if you've made it executable)", 'muted');
+    return;
+  }
+
+  // ---- ls ----
+  if (cmd === 'ls' || cmd === 'dir' || cmd === 'll' || cmd === 'ls -la' || cmd === 'ls -l'){
+    if (rest === '/' || rest === '/etc' || rest === '/home'){
+      logLine('the rest of the filesystem is not your concern right now.', 'muted');
+      return;
+    }
+    logLine('readme.txt   door.lock   key.sh');
+    return;
+  }
+
+  // ---- cat ----
+  if (cmd === 'cat' || cmd === 'less' || cmd === 'more' || cmd === 'head' || cmd === 'tail' || cmd === 'nano' || cmd === 'vim'){
+    if (!rest){
+      logLine('usage: cat <file>', 'warn');
+      return;
+    }
+    let fname = rest.replace(/^\.\//, '').trim().split(/\s+/).pop();
+    if (!FILES[fname]){
+      if (FILES[fname + '.txt']) fname = fname + '.txt';
+      else if (FILES[fname + '.sh']) fname = fname + '.sh';
+      else if (FILES[fname + '.lock']) fname = fname + '.lock';
+      else {
+        logLine(`cat: ${esc(fname)}: no such file`, 'warn');
+        GAME.wrong++;
+        if (GAME.wrong >= 3){ GAME.wrong = 0; nextHint(); }
+        return;
+      }
+    }
+    FILES[fname].split('\n').forEach(l => logLine(esc(l)));
+    return;
+  }
+
+  // ---- chmod ----
+  if (cmd === 'chmod'){
+    if (!rest){
+      logLine('usage: chmod +x <file>', 'warn');
+      return;
+    }
+    const modeMatch = rest.match(/(\+x|-x|755|700|555|644)/);
+    const fname = rest.split(/\s+/).pop().replace(/^\.\//, '');
+    if (!modeMatch){
+      logLine('chmod: unknown mode. try: chmod +x key.sh', 'warn');
+      return;
+    }
+    if (fname === 'key.sh' || fname === 'key'){
+      if (/644/.test(modeMatch[1])){
+        logLine('key.sh is now read-only. that won\'t help.', 'warn');
+        GAME.keyExecutable = false;
+        return;
+      }
+      GAME.keyExecutable = true;
+      logLine('key.sh is now executable.', 'ok');
+    } else {
+      logLine(`chmod: cannot access '${esc(fname)}': no such file`, 'warn');
+      GAME.wrong++;
+      if (GAME.wrong >= 3){ GAME.wrong = 0; nextHint(); }
+    }
+    return;
+  }
+
+  // ---- run ----
+  if (cmd === './key.sh' || cmd === './key' || cmd === 'bash' || cmd === 'sh' || cmd === 'zsh'){
+    let target;
+    if (cmd === 'bash' || cmd === 'sh' || cmd === 'zsh'){
+      target = rest.replace(/^\.\//, '').trim().split(/\s+/).pop();
+    } else {
+      target = 'key.sh';
+    }
+    if (target !== 'key.sh' && target !== 'key' && target !== ''){
+      logLine(`${esc(target)}: command not found`, 'warn');
+      return;
+    }
+    if (!GAME.keyExecutable){
+      logLine('bash: ./key.sh: Permission denied', 'warn');
+      GAME.wrong++;
+      if (GAME.wrong >= 2){ GAME.wrong = 0; nextHint(); }
+      return;
+    }
+    logLine('KEY = ' + DOOR_KEY, 'ok big');
+    return;
+  }
+
+  // ---- unlock ----
+  if (cmd === 'unlock' || cmd === 'open' || cmd === 'enter'){
+    if (!rest){
+      logLine('usage: unlock <key>', 'warn');
+      logLine('hint: you need to generate the key first.', 'muted');
+      return;
+    }
+    if (rest.trim() === DOOR_KEY){
+      return gameSolve();
+    }
+    logLine('unlock: wrong key', 'warn');
+    GAME.wrong++;
+    if (GAME.wrong >= 2){ GAME.wrong = 0; nextHint(); }
+    return;
+  }
+
+  // ---- unknown ----
+  logLine(`${esc(cmd)}: command not found`, 'warn');
+  GAME.wrong++;
+  if (GAME.wrong >= 3){
+    GAME.wrong = 0;
+    nextHint();
+  }
+}
+
+function initGame(){
+  const input   = document.getElementById('game-input');
+  const hintBtn = document.getElementById('game-hint');
+  const skipBtn = document.getElementById('game-skip');
+
+  if (!input){ finishBoot(); return; }
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter'){
+      e.preventDefault();
+      const v = input.value;
+      input.value = '';
+      gameCmd(v);
+    }
+  });
+
+  hintBtn?.addEventListener('click', () => { nextHint(); focusInput(); });
+  skipBtn?.addEventListener('click', () => finishBoot());
+
+  introSeq();
+}
+
+/* ============================================================
+   BOOT → SHELL
+   ============================================================ */
 let bootFinished = false;
 
 function finishBoot(){
   if (bootFinished) return;
   bootFinished = true;
-  bootSkipped = true;
   try {
-    document.getElementById('boot')?.classList.add('done');
+    const b = document.getElementById('boot');
+    if (b){
+      b.classList.add('done');
+      setTimeout(() => { b.style.display = 'none'; }, 400);
+    }
     const shell = document.getElementById('shell');
     if (shell) shell.hidden = false;
     render();
@@ -59,45 +373,12 @@ function finishBoot(){
   }
 }
 
-async function runBoot(){
-  const b   = document.getElementById('boot');
-  const out = document.getElementById('boot-text');
-  if (!b || !out) { finishBoot(); return; }
-
-  const failSafe = setTimeout(finishBoot, 3000);
-
-  try {
-    let buf = '';
-    for (const line of BOOT_LINES){
-      if (bootSkipped) break;
-      for (const ch of line){
-        if (bootSkipped) break;
-        buf += ch;
-        out.textContent = buf;
-        await sleep(ch === ' ' ? 1 : (line.length > 40 ? 2 : 4));
-      }
-      if (bootSkipped) break;
-      buf += '\n';
-      out.textContent = buf;
-      await sleep(20);
-    }
-    if (!bootSkipped){
-      buf += '\n[ press any key or click to skip ]\n';
-      out.textContent = buf;
-      await sleep(200);
-    }
-  } catch (err) {
-    console.warn('[LARPSOCIETY] boot interrupted:', err);
-  }
-
-  clearTimeout(failSafe);
-  finishBoot();
+function startBoot(){
+  let breached = false;
+  try { breached = sessionStorage.getItem('larp_breached') === '1'; } catch(e){}
+  if (breached){ finishBoot(); return; }
+  initGame();
 }
-
-/* skip on any interaction */
-document.addEventListener('click',    () => { if (!bootFinished) finishBoot(); }, true);
-document.addEventListener('keydown',  () => { if (!bootFinished) finishBoot(); }, true);
-document.addEventListener('touchstart',()=>{ if (!bootFinished) finishBoot(); }, {passive:true, capture:true});
 
 /* ============================================================
    HELPERS
@@ -117,7 +398,7 @@ function card(title, text, href, label = 'open'){
 }
 
 /* ============================================================
-   VIEWS
+   VIEWS (unchanged)
    ============================================================ */
 function Home(){
   return `<div class="page"><div class="wrap">
@@ -167,7 +448,7 @@ function Home(){
 
     <section class="term-note">
       <span class="prompt">guest@larpsociety:~$</span> <span class="typed">cat README.md</span>
-      <p>this is a static site built with vanilla js. no framework. no tracking. no phone-home. everything you see is loaded from public data files and the github api.</p>
+      <p>this is a static site built with vanilla js. no framework. no tracking. no phone-home.</p>
       <p>press <kbd>/</kbd> or <kbd>ctrl</kbd>+<kbd>k</kbd> to open the command palette.</p>
     </section>
   </div></div>`;
@@ -297,7 +578,7 @@ function ProjectDetail(){
       <div class="detail-grid">
         <div>
           <h3>:: the_idea</h3>
-          <p class="dim">build it, inspect it, remove the abstraction where it gets interesting.</p>
+          <p class="dim">build it, inspect it, inspect it again.</p>
           ${p.pipeline.map(x => `<div class="step"><b>${esc(x[0])}</b><span>${esc(x[1])}</span></div>`).join('')}
         </div>
         <div>
@@ -428,6 +709,7 @@ const CMDS = [
   { cmd: 'sahand',   desc: 'portfolio',               action: () => location.hash = '#/sahand' },
   { cmd: 'github',   desc: 'open github repo',        action: () => window.open('https://github.com/sahandkhodayi', '_blank') },
   { cmd: 'join',     desc: 'join the society',        action: () => window.open(JOIN_URL, '_blank') },
+  { cmd: 'replay',   desc: 'replay the breach intro', action: () => { try{sessionStorage.removeItem('larp_breached');}catch(e){} location.reload(); } },
   { cmd: 'reload',   desc: 'reload the page',         action: () => location.reload() },
 ];
 
@@ -499,7 +781,6 @@ document.addEventListener('input', e => {
   drawPalette();
 });
 
-/* palette: click items, footer buttons, or outside the box */
 document.addEventListener('click', e => {
   const pal = document.getElementById('palette');
   if (!pal || pal.hidden) return;
@@ -514,7 +795,6 @@ document.addEventListener('click', e => {
     return;
   }
 
-  // clicking the dim backdrop (but not the box) closes it
   if (e.target === pal) closePalette();
 });
 
@@ -534,12 +814,12 @@ document.addEventListener('click', e => {
 });
 
 /* ============================================================
-   BOOTloader
+   START
    ============================================================ */
 window.addEventListener('hashchange', render);
 
 if (document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', runBoot);
+  document.addEventListener('DOMContentLoaded', startBoot);
 } else {
-  runBoot();
+  startBoot();
 }

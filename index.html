@@ -16,9 +16,20 @@
   <div class="vignette"></div>
   <div class="crt"></div>
 
-  <!-- boot screen -->
+  <!-- entry game / boot -->
   <div id="boot" class="boot">
-    <pre id="boot-text" class="boot-text"></pre>
+    <div class="boot-inner">
+      <div id="game-log" class="game-log" aria-live="polite"></div>
+      <div class="game-input-row">
+        <span class="game-prompt">guest@larpsociety:~$</span>
+        <input id="game-input" class="game-input" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" autofocus>
+      </div>
+      <div class="game-footer">
+        <button type="button" class="game-btn" id="game-hint">[?] hint</button>
+        <button type="button" class="game-btn" id="game-skip">[»] skip intro</button>
+        <span class="game-tip">type <b>help</b> for commands</span>
+      </div>
+    </div>
   </div>
 
   <!-- main shell -->

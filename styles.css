@@ -651,3 +651,115 @@ footer a:hover{color:var(--accent2);text-shadow:var(--glow)}
   .home{min-height:420px;padding-top:34px}
   footer{flex-direction:column}
 }
+
+
+/* ============================================================
+   ENTRY GAME — fsociety breach terminal
+   ============================================================ */
+.boot{
+  position:fixed;inset:0;z-index:900;
+  background:#040201;
+  padding:32px;
+  overflow:hidden;
+  color:var(--fg);
+  font:13px/1.55 var(--mono);
+  text-shadow:var(--glow);
+  display:flex;
+  flex-direction:column;
+  transition:opacity .35s ease;
+}
+.boot.done{ opacity:0; pointer-events:none; }
+
+.boot-inner{
+  width:min(860px,100%);
+  height:100%;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+}
+
+.game-log{
+  flex:1;
+  overflow-y:auto;
+  padding:4px 4px 12px;
+  white-space:pre-wrap;
+  word-break:break-word;
+  scrollbar-width:thin;
+  scrollbar-color:var(--line2) transparent;
+}
+.game-log::-webkit-scrollbar{width:8px}
+.game-log::-webkit-scrollbar-track{background:transparent}
+.game-log::-webkit-scrollbar-thumb{background:var(--line2)}
+
+.game-line{
+  min-height:1.55em;
+  padding:1px 0;
+}
+.game-line.muted{ color:var(--fg3); }
+.game-line.warn{ color:var(--red); }
+.game-line.ok{ color:var(--accent2); }
+.game-line.big{ font-size:16px; letter-spacing:.12em; }
+.game-line.hint{ color:var(--accent2); padding-left:8px; }
+.game-line.echo{ color:var(--fg2); }
+.game-line .game-user{ color:var(--accent2); }
+.game-line .game-hint-mark{ color:var(--accent); font-weight:bold; margin-right:4px; }
+.game-line .ok{ color:var(--accent2); text-shadow:var(--glow); }
+
+.game-input-row{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 4px 8px;
+  border-top:1px dashed var(--line);
+}
+.game-prompt{
+  color:var(--accent2);
+  white-space:nowrap;
+  text-shadow:var(--glow);
+}
+.game-input{
+  flex:1;
+  background:transparent;
+  border:0;
+  outline:0;
+  color:var(--bright);
+  font:inherit;
+  caret-color:var(--accent);
+  text-shadow:var(--glow);
+  padding:2px 0;
+  min-width:0;
+}
+.game-input::selection{ background:var(--accent); color:#040201; }
+
+.game-footer{
+  display:flex;align-items:center;gap:16px;
+  padding:8px 4px 0;
+  font-size:11px;
+  color:var(--fg4);
+  border-top:1px solid var(--line);
+}
+.game-btn{
+  background:none;
+  border:0;
+  color:var(--fg3);
+  font:inherit;
+  font-size:11px;
+  cursor:pointer;
+  padding:2px 0;
+  letter-spacing:.05em;
+  font-family:var(--mono);
+}
+.game-btn:hover{ color:var(--accent); text-shadow:var(--glow); }
+.game-btn:focus-visible{ outline:1px dashed var(--accent); outline-offset:2px; }
+
+.game-tip{
+  margin-left:auto;
+  color:var(--fg4);
+  font-size:10px;
+  letter-spacing:.04em;
+}
+.game-tip b{ color:var(--accent2); font-weight:normal; }
+
+@media(max-width:520px){
+  .boot{ padding:16px; font-size:12px; }
+  .game-tip{ display:none; }
+  .game-footer{ gap:12px; }
+}
