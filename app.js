@@ -1,3 +1,4 @@
+
 const { SITE, PROJECTS, EXPERIMENTS, KNOWLEDGE, CONNECTIONS, SYSTEMS_TOPICS, MEM, ACTIVITY, MEMBERS, NEWS } = window;
 const h = value => String(value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 const rows = data => `<dl class="spec">${data.map(([k,v])=>`<div class="spec-row"><dt>${h(k)}</dt><dd>${h(v)}</dd></div>`).join("")}</dl>`;
