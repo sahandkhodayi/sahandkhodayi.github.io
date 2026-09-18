@@ -3,23 +3,88 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>LARPSOCIETY :: fsociety terminal</title>
-  <meta name="description" content="LARPSOCIETY — an underground clubhouse for experiments, projects, people, and ideas on the web.">
-  <meta name="theme-color" content="#0a0603">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' fill='%230a0603'/><text x='50%25' y='58%25' font-family='monospace' font-size='52' fill='%23ff8c00' text-anchor='middle'>$</text></svg>">
+  <title>Sahand Khodayi</title>
+  <meta name="description" content="Sahand Khodayi — AI, ML, math, C, systems. Interactive projects you can play with.">
+  <meta name="theme-color" content="#17120f">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='8' fill='%2317120f'/><text x='50%25' y='60%25' font-family='monospace' font-size='44' fill='%23b8895a' text-anchor='middle'>S</text></svg>">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="scanlines"></div><div class="vignette"></div><div class="crt"></div>
-  <div id="boot" class="boot"><div class="boot-inner"><div id="game-log" class="game-log" aria-live="polite"></div><div class="game-input-row"><span class="game-prompt">guest@larpsociety:~$</span><input id="game-input" class="game-input" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" autofocus></div><div class="game-footer"><button type="button" class="game-btn" id="game-hint">[?] hint</button><button type="button" class="game-btn" id="game-skip">[»] skip intro</button><span class="game-tip">type <b>help</b> for commands</span></div></div></div>
-  <div id="shell" class="shell" hidden><header class="topbar"><a class="logo" href="#/">LARP<span>●</span>SOCIETY</a><nav id="nav"><a href="#/discover">discover</a><a href="#/lab">lab</a><a href="#/people">people</a><a href="#/projects">projects</a><a href="#/forum">forum</a><a href="#/news">news</a><a class="sahand-link" href="#/sahand">sahand ↗</a></nav><div class="topbar-right"><span class="status-dot" title="online"></span><span class="clock" id="clock">--:--:--</span><button id="menu" class="menu" aria-label="menu" aria-expanded="false">≡</button></div></header><main id="app"></main><footer><div class="footer-left"><span>└─[ LARP●SOCIETY ]─[ an internet clubhouse for curious people ]</span></div><div class="footer-right"><a href="#/sahand">sahand</a><a href="https://github.com/sahandkhodayi" target="_blank" rel="noopener">github ↗</a></div></footer></div>
-  <div id="palette" class="palette" hidden><div class="palette-box" role="dialog" aria-modal="true" aria-label="command palette"><div class="palette-bar"><span class="prompt">root@larpsociety:~$</span><input id="palette-input" placeholder="run a command…  (lab, people, sahand, github)" autocomplete="off" spellcheck="false"></div><div id="palette-list" class="palette-list"></div><div class="palette-foot"><span data-act="up">[↑] up</span><span data-act="down">[↓] down</span><span data-act="run">[↵] run</span><button type="button" class="pal-btn" data-act="close">[esc] close</button></div></div></div>
-  <script src="data.js"></script><script src="app.js"></script><script src="site-fixes.js"></script>
-  <script src="site-fixes.js"></script>
-  <script src="theme-toggle.js"></script>  
+  <div class="grain"></div>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+  <div class="crt"></div>
+
+  <!-- terminal breach game — easter egg, hidden by default -->
+  <div id="boot" class="boot" style="display:none">
+    <div class="boot-inner">
+      <div id="game-log" class="game-log" aria-live="polite"></div>
+      <div class="game-input-row">
+        <span class="game-prompt">guest@larpsociety:~$</span>
+        <input id="game-input" class="game-input" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off">
+      </div>
+      <div class="game-footer">
+        <button type="button" class="game-btn" id="game-hint">[?] hint</button>
+        <button type="button" class="game-btn" id="game-skip">[»] exit</button>
+        <span class="game-tip">type <b>help</b> for commands</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="shell" class="shell">
+    <header class="topbar">
+      <a class="logo" href="#/">SAHAND<span>●</span>KHODAYI</a>
+      <nav id="nav">
+        <a href="#/lab">lab</a>
+        <a href="#/projects">projects</a>
+        <a href="#/about">about</a>
+        <a href="https://github.com/sahandkhodayi" target="_blank" rel="noopener">github ↗</a>
+      </nav>
+      <div class="topbar-right">
+        <span class="status-dot" title="online"></span>
+        <span class="clock" id="clock">--:--:--</span>
+        <button id="menu" class="menu" aria-label="menu" aria-expanded="false">≡</button>
+      </div>
+    </header>
+
+    <main id="app"></main>
+
+    <footer>
+      <div class="footer-left">
+        <span>└─[ build it · break it · understand it ]</span>
+      </div>
+      <div class="footer-right">
+        <a href="#/about">sahand</a>
+        <a href="https://github.com/sahandkhodayi" target="_blank" rel="noopener">github ↗</a>
+      </div>
+    </footer>
+  </div>
+
+  <div id="palette" class="palette" hidden>
+    <div class="palette-box" role="dialog" aria-modal="true" aria-label="command palette">
+      <div class="palette-bar">
+        <span class="prompt">root@sahand:~$</span>
+        <input id="palette-input" placeholder="type a command…  (lab, projects, about, github)" autocomplete="off" spellcheck="false">
+      </div>
+      <div id="palette-list" class="palette-list"></div>
+      <div class="palette-foot">
+        <span data-act="up">[↑] up</span>
+        <span data-act="down">[↓] down</span>
+        <span data-act="run">[↵] run</span>
+        <button type="button" class="pal-btn" data-act="close">[esc] close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="media.js"></script>
+  <script src="app.js"></script>
+  <script src="theme-toggle.js"></script>
   <script src="hacker-fx.js"></script>
   <script src="palette-larp.js"></script>
   <script src="larp-shutdown.js"></script>
-  <script src="lab-larp.js"></script>
+  <script src="breach.js"></script>
+  <script src="lab.js"></script>
+  <script src="site-fixes.js"></script>
 </body>
 </html>

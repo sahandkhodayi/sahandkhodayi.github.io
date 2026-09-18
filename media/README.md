@@ -1,19 +1,19 @@
-# LARPSOCIETY project media
+# media
 
-Put project screenshots, demos, recordings, and thumbnails inside the matching project folder.
+Drop images and videos for each project into the matching folder.
+Then open `media.js` in the repo root and add an entry to the
+corresponding array. Nothing shows on the site until you add it.
 
-```text
-media/
-├── number-guesser/
-├── nn-from-scratch/
-├── ml-models-from-scratch/
-└── math-network/
-```
+## Supported types
 
-Suggested files:
-- `hero.webp` — project card image
-- `demo.mp4` — short demo
-- `screen-01.webp`, `screen-02.webp` — screenshots
-- `diagram.svg` — architecture / diagram
+{ "type": "image", "src": "media/number-guesser/drawing.png", "caption": "drawing a 7" }
+{ "type": "video", "src": "media/number-guesser/inference.mp4", "caption": "C inference", "poster": "media/number-guesser/thumb.png" }
 
-Keep large videos short and compressed for GitHub Pages.
+## Folder names must match the project slug
+
+- number-guesser
+- nn-from-scratch
+- ml-models-from-scratch
+- math-network
+
+Keep filenames lowercase, no spaces. Use dashes if needed.
